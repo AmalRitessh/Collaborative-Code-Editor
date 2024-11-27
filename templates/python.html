@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Text Editor</title>
+
+    <!-- CodeMirror CSS --> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/theme/material-darker.min.css">
+
+    <style>
+    .CodeMirror {
+        font-size: 20px; /* Adjust this value to increase or decrease text size */
+    }
+    </style>
+
+</head>
+<body>
+
+    <h1>Python Text Editor</h1>
+    <a href="{{ url_for('index')}}">home</a>
+    <!-- Create TextArea -->
+    <textarea id="textEditor" name="textEditor" rows="100" cols="100"></textarea>
+    <button onclick="fetchData()">run</button>
+    <p>input</p>
+    <textarea id="inputArea" name="inputArea" rows="10" cols="10"></textarea>
+    <p>output</p>
+    <textarea id="outputArea" name="outputArea" rows="100" cols="100"></textarea>
+
+    
+
+    <!-- CodeMirror JS-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/mode/python/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/addon/edit/closebrackets.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/addon/edit/matchbrackets.min.js"></script>
+
+    <script>
+        // Initialize CodeMirror
+        var textEditor = CodeMirror.fromTextArea(document.getElementById('textEditor'), {
+            mode: "python",                   // Set language mode to Python
+            lineNumbers: true,                // Show line numbers
+            theme: "material-darker",         // Set theme (optional)
+            autoCloseBrackets: true,          // Auto-close brackets and parentheses
+            matchBrackets: true,              // Highlight matching brackets
+            indentUnit: 4,                    // Set indentation to 4 spaces
+            tabSize: 4,                       // Set tab size
+            smartIndent: true,                // Enable smart indentation
+            indentWithTabs: false,            // Use spaces for indentation
+        });
+
+        var outputArea = CodeMirror.fromTextArea(document.getElementById('outputArea'), {
+            mode: "text/plain",                   // Set language mode to Python
+            lineNumbers: false,                // Show line numbers
+            theme: "material-darker",         // Set theme (optional)
+            autoCloseBrackets: true,          // Auto-close brackets and parentheses
+            matchBrackets: true,              // Highlight matching brackets
+            indentUnit: 4,                    // Set indentation to 4 spaces
+            tabSize: 4,                       // Set tab size
+            smartIndent: true,                // Enable smart indentation
+            indentWithTabs: false,            // Use spaces for indentation
+        });
+
+        var inputArea = CodeMirror.fromTextArea(document.getElementById('inputArea'), {
+            mode: "text/plain",            // Set language mode to Python
+            lineNumbers: false,                // Show line numbers
+            theme: "material-darker",         // Set theme (optional)
+            autoCloseBrackets: true,          // Auto-close brackets and parentheses
+            matchBrackets: true,              // Highlight matching brackets
+            indentUnit: 4,                    // Set indentation to 4 spaces
+            tabSize: 4,                       // Set tab size
+            smartIndent: true,                // Enable smart indentation
+            indentWithTabs: false,            // Use spaces for indentation
+        });
+    </script>
+    <script>
+        async function fetchData() {
+
+        const code = textEditor.getValue();
+        const input = inputArea.getValue();
+
+        const response = await fetch('/python', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({codeVal:code,inputVal:input}), // Example payload
+        });
+
+        const data = await response.json();
+        outputArea.setValue(data.result);
+        }
+    </script>
+
+</body>
+</html>
