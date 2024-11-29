@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CollaBrix</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #3F4E4F; /* Light gray background */
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            width: 350px;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #DCD7C9; /* White box */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+            text-align: center;
+        }
+
+        input {
+            width: 90%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 45%;
+            padding: 10px;
+            margin: 10px 5px;
+            border: none;
+            border-radius: 5px;
+            background-color: #A27B5C; /* Green button */
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        button:hover {
+            background-color: #bea189; /* Darker green on hover */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <input type="text" id="roomId" name="roomId" required placeholder="Room Id">
+        <input type="text" id="userName" name="userName" required placeholder="User Name">
+        <button type="submit">Join</button>
+        <button>Create Room Id</button>
+    </div>
+</body>
+</html>
