@@ -24,19 +24,26 @@
             text-align: center;
         }
 
+        .container img {
+            max-width: 90%; /* Ensures the image fits the width */
+            height: auto; /* Maintains aspect ratio */
+            margin-bottom: 1px; /* Adds spacing between the image and inputs */
+            border-radius: 5px; /* Optional: Rounds the image corners */
+        }
+
         input {
             width: 90%;
             padding: 10px;
-            margin: 10px 0;
+            margin: 5px 0;
             border: 1px solid #ccc;
             border-radius: 5px;
             box-sizing: border-box;
         }
 
         button {
-            width: 45%;
+            width: 43%;
             padding: 10px;
-            margin: 10px 5px;
+            margin: 5px 5px;
             border: none;
             border-radius: 5px;
             background-color: #A27B5C; /* Green button */
@@ -52,6 +59,7 @@
 </head>
 <body>
     <div class="container">
+        <img src="./static/img/logo.png">
         <input type="text" id="roomId" name="roomId" required placeholder="Room Id">
         <input type="text" id="userName" name="userName" required placeholder="User Name">
         <button type="submit">Join</button>
