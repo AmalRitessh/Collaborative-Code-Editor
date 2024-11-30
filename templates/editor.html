@@ -19,12 +19,15 @@
 
 <body>
 
-    <h1>c++ Text Editor</h1>
+    <h1>Editor</h1>
     <a href="{{ url_for('index')}}">home</a>
     
     <!-- Create TextArea -->
     
-
+    <select name="language" id="language">
+        <option value = "python">python</option>
+        <option value = "cpp">cpp</option>
+    </select>
     <textarea id="textEditor" name="textEditor" rows="100" cols="100"></textarea>
     <button onclick="fetchData()">run</button>
     <p>input</p>
@@ -36,45 +39,41 @@
     <!-- CodeMirror JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/mode/clike/clike.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/mode/python/python.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/addon/edit/closebrackets.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/addon/edit/matchbrackets.min.js"></script>
 
     <script>
-        // Initialize CodeMirror
+        
+        let syntaxSelector = {cpp : 'text/x-c++src', python : 'python' }
+        const lang = document.getElementById('language');
+
         var textEditor = CodeMirror.fromTextArea(document.getElementById('textEditor'), {
-            mode: "text/x-c++src",            // Set language mode to Python
-            lineNumbers: true,                // Show line numbers
-            theme: "material-darker",         // Set theme (optional)
-            autoCloseBrackets: true,          // Auto-close brackets and parentheses
-            matchBrackets: true,              // Highlight matching brackets
-            indentUnit: 4,                    // Set indentation to 4 spaces
-            tabSize: 4,                       // Set tab size
-            smartIndent: true,                // Enable smart indentation
-            indentWithTabs: false,            // Use spaces for indentation
+            mode: syntaxSelector[lang.value],
+            lineNumbers: true,
+            theme: "material-darker",
+            autoCloseBrackets: true,
+            matchBrackets: true,
+            indentUnit: 4,
+            tabSize: 4,
+            smartIndent: true,
+            indentWithTabs: false,
         });
 
         var outputArea = CodeMirror.fromTextArea(document.getElementById('outputArea'), {
-            mode: "text/plain",            // Set language mode to Python
-            lineNumbers: false,                // Show line numbers
-            theme: "material-darker",         // Set theme (optional)
-            autoCloseBrackets: true,          // Auto-close brackets and parentheses
-            matchBrackets: true,              // Highlight matching brackets
-            indentUnit: 4,                    // Set indentation to 4 spaces
-            tabSize: 4,                       // Set tab size
-            smartIndent: true,                // Enable smart indentation
-            indentWithTabs: false,            // Use spaces for indentation
+            mode: "text/plain",
+            lineNumbers: false,
+            theme: "material-darker",
         });
 
         var inputArea = CodeMirror.fromTextArea(document.getElementById('inputArea'), {
-            mode: "text/plain",            // Set language mode to Python
-            lineNumbers: false,                // Show line numbers
-            theme: "material-darker",         // Set theme (optional)
-            autoCloseBrackets: true,          // Auto-close brackets and parentheses
-            matchBrackets: true,              // Highlight matching brackets
-            indentUnit: 4,                    // Set indentation to 4 spaces
-            tabSize: 4,                       // Set tab size
-            smartIndent: true,                // Enable smart indentation
-            indentWithTabs: false,            // Use spaces for indentation
+            mode: "text/plain",
+            lineNumbers: false,
+            theme: "material-darker",
+        });
+
+        lang.addEventListener('change', () => {
+            textEditor.setOption('mode', syntaxSelector[lang.value]);
         });
 
     </script>
@@ -83,13 +82,15 @@
 
         const code = textEditor.getValue();
         const input = inputArea.getValue();
+        const lang = document.getElementById('language').value;
 
-        const response = await fetch('/cpp', {
+        console.log(lang)
+        const response = await fetch('/editor', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({codeVal:code,inputVal:input}), // Example payload
+            body: JSON.stringify({codeVal:code,inputVal:input,langType:lang}),
         });
 
         const data = await response.json();

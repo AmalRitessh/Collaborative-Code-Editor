@@ -14,32 +14,19 @@ def index():
 def home():
 	return render_template('home.html')
 
-@app.route('/python',methods=['POST','GET'])
-def python():
-	if request.method  == 'POST':
-
-		code = request.get_json().get('codeVal')
-		inputVal = request.get_json().get('inputVal')
-
-		output = code_exe("python",code,inputVal)
-		data = {'result':output}
-		
-		return jsonify(data)
-	else:
-		return render_template('python.html')
-
-@app.route('/cpp',methods=['POST','GET'])
-def cpp():
+@app.route('/editor',methods=['POST','GET'])
+def editor():
 	if request.method  == 'POST':
 		
 		code = request.get_json().get('codeVal')
 		inputVal = request.get_json().get('inputVal')
+		langType = request.get_json().get('langType')
 
-		output = code_exe("cpp",code,inputVal)
+		output = code_exe(langType,code,inputVal)
 		data = {'result':output}
 		return jsonify(data)
 	else:
-		return render_template('cpp.html')
+		return render_template('editor.html')
 
 def code_exe(language,code,inputVal):
 
@@ -84,7 +71,6 @@ def code_exe(language,code,inputVal):
 		if os.path.exists(folderPath):
 			shutil.rmtree(folderPath)
 		return "Timeout expired. The code execution took too long."
-
 
 if __name__ == '__main__':
 	app.run(debug=True)
