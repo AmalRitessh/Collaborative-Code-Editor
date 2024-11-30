@@ -15,9 +15,23 @@
             font-family: Arial, sans-serif;
         }
 
+        .main-wrapper {
+            display: flex;
+            flex-wrap: wrap; /* Allows repositioning on smaller screens */
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .logo2 {
+            max-width: 300px; /* Ensures proper sizing of the image */
+            height: auto;
+            margin: 10px; /* Adds spacing */
+        }
+
         .container {
-            width: 350px;
-            padding: 20px;
+            width: 400px;
+            padding: 30px;
             border-radius: 10px;
             background-color: #DCD7C9; /* White box */
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow */
@@ -25,7 +39,7 @@
         }
 
         .container img {
-            max-width: 90%; /* Ensures the image fits the width */
+            max-width: 65%; /* Ensures the image fits the width */
             height: auto; /* Maintains aspect ratio */
             margin-bottom: 1px; /* Adds spacing between the image and inputs */
             border-radius: 5px; /* Optional: Rounds the image corners */
@@ -38,6 +52,7 @@
             border: 1px solid #ccc;
             border-radius: 5px;
             box-sizing: border-box;
+            font-size: 16px;
         }
 
         button {
@@ -49,21 +64,36 @@
             background-color: #A27B5C; /* Green button */
             color: white;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 16px;
         }
 
         button:hover {
             background-color: #bea189; /* Darker green on hover */
         }
+
+        @media (max-width: 768px) {
+            .main-wrapper {
+                flex-direction: column; /* Stacks elements vertically */
+            }
+
+            .logo2 {
+                max-width: 120px; /* Smaller logo for smaller screens */
+            }
+
+            .container {
+                margin-top: 10px; /* Adds spacing between logo2 and container */
+            }
+        }
     </style>
 </head>
-<body>
-    <div class="container">
-        <img src="./static/img/logo.png">
-        <input type="text" id="roomId" name="roomId" required placeholder="Room Id">
-        <input type="text" id="userName" name="userName" required placeholder="User Name">
-        <button type="submit">Join</button>
-        <button>Create Room Id</button>
-    </div>
+<body class="main-wrapper">
+        <img src="./static/img/logo2.png" class="logo2" alt="Logo2">
+        <div class="container">
+            <img src="./static/img/logo3.png" alt="CollaBrix Logo">
+            <input type="text" id="roomId" name="roomId" required placeholder="Room Id">
+            <input type="text" id="userName" name="userName" required placeholder="User Name">
+            <button type="submit">Join</button>
+            <button>Create Room Id</button>
+        </div>
 </body>
 </html>
