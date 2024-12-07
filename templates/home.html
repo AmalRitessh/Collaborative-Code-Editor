@@ -8,20 +8,54 @@
 </head>
 <body>
 
-    <div class="my-12 flex h-full min-w-full flex-col items-center justify-evenly sm:flex-row sm:pt-0">
-        <div class="flex w-full animate-up-down justify-center sm:w-1/2 sm:pl-4">
-            <img src="./static/img/logo2.png" alt="Logo2" class="logo2">  
+    <div class = "my-12 flex h-full min-w-full flex-col items-center justify-evenly sm:flex-row sm:pt-0">
+        <div class ="flex w-full animate-up-down justify-center sm:w-1/2 sm:pl-4">
+            <img src ="./static/img/logo2.png" alt="Logo2" class="logo2">  
         </div>
-        <div class="flex items-center justify-center sm:w-1/2 left-right-pad" >
-            <div class="container flex w-full max-w-[500px] flex-col items-center justify-center">
-                <img src="./static/img/logo3.png" alt="CollaBrix Logo" >
-                <input type="text" id="roomId" name="roomId" required placeholder="Room Id">
-                <input type="text" id="userName" name="userName" required placeholder="User Name">
-                <button type="">Join</button>
-                <button>Create Room Id</button>
+        <div class = "flex items-center justify-center sm:w-1/2 left-right-pad" >
+            <div class ="container flex w-full max-w-[500px] flex-col items-center justify-center">
+                <img src ="./static/img/logo3.png" alt="CollaBrix Logo" >
+                <input type ="text" id="roomId" name="roomId" required placeholder="Room Id">
+                <input type ="text" id="userName" name="userName" required placeholder="User Name">
+                <button onclick = "joinRoom()">Join</button>
+                <button onclick = "generateRoomId()">Generate Room Id</button>
             </div>
         </div>
     </div>
+    <script>
+        function generateRoomId(){
+            const uuid = crypto.randomUUID();
+            const roomId = document.getElementById('roomId');
+            roomId.value = uuid;
+        }
+        function joinRoom() {
+            const roomId = document.getElementById('roomId').value;
+            const userName = document.getElementById('userName').value;
+            if(!roomId){
+                alert("Enter valid Room Id");
+            }
+            
+            else if(!userName){
+                alert("Enter valid Username");
+            }
+
+            else{
+                const form = document.createElement("form");
+                form.method = "POST";
+                form.action = `/editor/${roomId}`; 
+
+                const userInput = document.createElement("input");
+                userInput.type = "hidden";
+                userInput.name = "username";
+                userInput.value = userName;
+                form.appendChild(userInput);
+
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+
+    </script>
     
 </body>
 </html>
