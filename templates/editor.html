@@ -44,7 +44,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/addon/edit/matchbrackets.min.js"></script>
 
     <script>
-        
         let syntaxSelector = {cpp : 'text/x-c++src', python : 'python' }
         const lang = document.getElementById('language');
 
@@ -85,7 +84,7 @@
         const lang = document.getElementById('language').value;
 
         console.log(lang)
-        const response = await fetch('/editor', {
+        const response = await fetch('/compile', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -96,6 +95,40 @@
         const data = await response.json();
         outputArea.setValue(data.result);
         }
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.js"></script>
+    <script>
+        const socket = io();
+        const room_id = "{{ room_id }}";
+
+        // Join the room
+        if (!window.hasRunOnce) {
+            window.hasRunOnce = true;
+            socket.emit('join', { room: room_id });    
+        }
+
+        // Respond to request for text
+        socket.on('request_text', (data) => {
+            if (data.room === room_id) {
+                const text = textEditor.getValue();
+                if(text!=""){
+                    socket.emit('update_text', { room: room_id, text });    
+                }  
+            }
+        });
+
+        // Receive and update editor text
+        socket.on('update_text', (data) => {
+            textEditor.setValue(data.text);
+        });
+
+        // Send updates to the server on input change
+        editor.addEventListener('input', () => {
+            const text = textEditor.getValue();
+            socket.emit('update_text', { room: room_id, text });
+        });
+
     </script>
 
 </body>

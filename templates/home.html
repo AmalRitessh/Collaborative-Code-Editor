@@ -15,8 +15,8 @@
         <div class = "flex items-center justify-center sm:w-1/2 left-right-pad" >
             <div class ="container flex w-full max-w-[500px] flex-col items-center justify-center">
                 <img src ="./static/img/logo3.png" alt="CollaBrix Logo" >
-                <input type ="text" id="roomId" name="roomId" required placeholder="Room Id">
-                <input type ="text" id="userName" name="userName" required placeholder="User Name">
+                <input type ="text" id="roomId" name="roomId" placeholder="Room Id" value="{{ room_id }}" required>
+                <input type ="text" id="userName" name="userName" placeholder="User Name" required>
                 <button onclick = "joinRoom()">Join</button>
                 <button onclick = "generateRoomId()">Generate Room Id</button>
             </div>
