@@ -119,15 +119,22 @@
             }
         });
 
+
+        let isProgrammaticChange = false;
         // Receive and update editor text
         socket.on('update_text', (data) => {
+            isProgrammaticChange = true;
+            const cursor = textEditor.getCursor();
             textEditor.setValue(data.text);
+            textEditor.setCursor(cursor);
+            isProgrammaticChange = false;
         });
 
         // Send updates to the server on input change
-                // Send updates to the server on input change
         textEditor.on('change', () => {
+            if (isProgrammaticChange) return;
             const text = textEditor.getValue();
+            console.log(text);
             socket.emit('update_text', { room: room_id, text });
         });
 
