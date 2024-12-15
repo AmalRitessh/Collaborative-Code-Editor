@@ -78,6 +78,7 @@
     </script>
     <script>
         async function fetchData() {
+		console.log("fetchdata");
 
         const code = textEditor.getValue();
         const input = inputArea.getValue();
@@ -124,7 +125,8 @@
         });
 
         // Send updates to the server on input change
-        editor.addEventListener('input', () => {
+                // Send updates to the server on input change
+        textEditor.on('change', () => {
             const text = textEditor.getValue();
             socket.emit('update_text', { room: room_id, text });
         });

@@ -56,6 +56,18 @@ def editor(room_id):
 
 
 
+@socketio.on('join')
+def handle_join(data):
+    room = data['room']
+    join_room(room)
+    emit('request_text', {'room': room}, to = room, skip_sid = True)  # Request current text from the room
+
+@socketio.on('update_text')
+def handle_update(data):
+    room = data['room']
+    text = data['text']
+    emit('update_text', {'text': text}, to = room, skip_sid = True)   # Broadcast to all users
+
 
 
 
