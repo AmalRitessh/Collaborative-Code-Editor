@@ -134,7 +134,6 @@
         textEditor.on('change', () => {
             if (isProgrammaticChange) return;
             const text = textEditor.getValue();
-            console.log(text);
             socket.emit('update_text', { room: room_id, text });
         });
 

@@ -14,22 +14,6 @@ def index():
 	room_id = request.args.get('room_id', '')
 	return render_template('home.html', room_id=room_id)
 
-"""
-@app.route('/editor',methods=['POST','GET'])
-def editor():
-	if request.method  == 'POST':
-		
-		code = request.get_json().get('codeVal')
-		inputVal = request.get_json().get('inputVal')
-		langType = request.get_json().get('langType')
-
-		output = code_exe(langType,code,inputVal)
-		data = {'result':output}
-		return jsonify(data)
-	else:
-		return render_template('editor.html')
-"""
-#---------------------------------------------------------------------------
 @app.route('/compile',methods=['POST','GET'])
 def compile():
 	if request.method  == 'POST':
@@ -44,7 +28,6 @@ def compile():
 	else:
 		return jsonify({'error':'invalid access'}) 
 
-
 @app.route('/editor/<string:room_id>', methods=['GET', 'POST'])
 def editor(room_id):
     if request.method == 'POST':
@@ -52,9 +35,6 @@ def editor(room_id):
         return render_template('editor.html', room_id=room_id, userName=username)
     else:
         return redirect((url_for("index", room_id = room_id)))
-#----------------------------------------------------------------------------
-
-
 
 @socketio.on('join')
 def handle_join(data):
@@ -67,13 +47,6 @@ def handle_update(data):
     room = data['room']
     text = data['text']
     emit('update_text', {'text': text}, to = room, skip_sid = True)   # Broadcast to all users
-
-
-
-
-
-
-
 
 def code_exe(language,code,inputVal):
 
