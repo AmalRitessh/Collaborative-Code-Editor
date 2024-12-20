@@ -113,15 +113,20 @@
         <h1>Editor</h1> 
     </div>
     <div id = bottom>
+
         <div id="sidebar">
             <div class="tab active" onclick="toggleTab('file')"><img src="/static/img/open-folder.png" style = "width: 30px;"></div>
             <div class="tab" onclick="toggleTab('run')"><img src="/static/img/play.png" style = "width: 30px;"></div>
             <div class="tab" onclick="toggleTab('users')"><img src="/static/img/person.png" style = "width: 30px;"></div>
         </div>
+
         <div id="ioAreaDiv">
+
             <div id="file" class="content">
-                <p>This is the File Tab content. Add file-related functionality here.</p>
+                <button onclick="createFile()">file</button>
+                <div class="tab active" onclick="toggleEditor('editor1')">index.py<img src="/static/img/cross.png" onclick="deleteFile(event)" style = "width: 30px;"></div>
             </div>
+
             <div id="run" class="content hidden">
                 <select name="language" id="language">
                     <option value="python">python</option>
@@ -133,13 +138,20 @@
                 <p>Output:</p>
                 <textarea id="outputArea" name="outputArea" rows="10" cols="10"></textarea>
             </div>
+
             <div id="users" class="content hidden">
                 <p>This is the Users Tab content. Add user-related functionality here.</p>
                 <a href="{{ url_for('index')}}">home</a>
             </div>
+
         </div>
+
         <div id="textAreaDiv">
-            <textarea id="textEditor" name="textEditor" rows="100" cols="100"></textarea>
+
+            <div id="editor1">
+                <textarea id="textEditor" name="textEditor" rows="100" cols="100">#hello1</textarea>
+            </div>
+
         </div>
         </div>
     </div>
@@ -186,6 +198,85 @@
             // Update the activeTab variable
             activeTab = tabId;
         }// Track the current state of the ioAreaDiv
+
+        function toggleEditor(editorId) {
+            const editors = document.querySelectorAll('#textAreaDiv > div');
+            editors.forEach(editor => {
+                editor.style.display = editor.id === editorId ? 'block' : 'none';
+            });
+
+            const tab = document.querySelector(`#file .tab[onclick*="${editorId}"]`);
+            if (tab) {
+                const fileName = tab.textContent.split('*')[0].trim(); // Extract the file name before 'x'
+                const fileExtension = fileName.split('.').pop(); // Get the text after the last '.'
+                alert(fileExtension); // Alert the file extension
+            }
+        }
+
+        let fileCount = 1; // Start from the current number of files
+
+        function createFile() {
+            const fileName = window.prompt("Enter file name");
+            if (!fileName) return; // Exit if no file name is provided
+
+            fileCount++; // Increment the file counter
+            const newEditorId = `editor${fileCount}`;
+
+            // Add new tab to the file div
+            const fileDiv = document.getElementById('file');
+            const newTab = document.createElement('div');
+            const image = document.createElement('img');
+            image.setAttribute('src', `/static/img/cross.png`);
+            image.setAttribute('onclick',`deleteFile(event)`);
+            image.setAttribute('style',`width: 30px;`);
+            
+            newTab.className = "tab active";
+            newTab.setAttribute('onclick', `toggleEditor('${newEditorId}')`);
+            newTab.textContent = fileName;
+            
+            newTab.appendChild(image);
+            fileDiv.appendChild(newTab);
+
+            // Add new editor to the textAreaDiv
+            const textAreaDiv = document.getElementById('textAreaDiv');
+            const newEditor = document.createElement('div');
+            newEditor.id = newEditorId;
+
+            const newTextArea = document.createElement('textarea');
+            newTextArea.id = "textEditor";
+            newTextArea.name = "textEditor";
+            newTextArea.rows = 100;
+            newTextArea.cols = 100;
+
+            newEditor.appendChild(newTextArea);
+            textAreaDiv.appendChild(newEditor);
+
+            // Hide all other editors and show the new one
+            toggleEditor(newEditorId);
+        }
+
+        function deleteFile(event) {
+            // Prevent triggering parent element's click event
+            event.stopPropagation();
+
+            // Find the tab and editor associated with the delete button
+            const tabToDelete = event.target.parentElement;
+            const editorId = tabToDelete.getAttribute('onclick').match(/'([^']+)'/)[1]; // Extract the editor ID
+            const editorToDelete = document.getElementById(editorId);
+
+            // Remove the tab and editor
+            tabToDelete.remove();
+            if (editorToDelete) {
+                editorToDelete.remove();
+            }
+
+            // Optionally, handle active tab switching
+            const remainingTabs = document.querySelectorAll('#file .tab');
+            if (remainingTabs.length > 0) {
+                remainingTabs[0].click(); // Activate the first remaining tab
+            }
+        }
+
 
 
     </script>
