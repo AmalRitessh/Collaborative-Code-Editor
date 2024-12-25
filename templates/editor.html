@@ -149,7 +149,7 @@
         <div id="textAreaDiv">
 
             <div id="editor1">
-                <textarea id="textEditor" name="textEditor" rows="100" cols="100">#hello1</textarea>
+                <textarea id="textEditor1" name="textEditor" rows="100" cols="100">#hello1</textarea>
             </div>
 
         </div>
@@ -160,6 +160,8 @@
  <script>
         let activeTab = "file"; // Tracks the currently active tab
         let isRetracted = false; // Tracks whether ioAreaDiv is retracted
+        fileExtension = "py";
+        currentTextEditor = textEditor1;
 
         function toggleTab(tabId) {
             const ioAreaDiv = document.getElementById("ioAreaDiv");
@@ -205,28 +207,11 @@
                 editor.style.display = editor.id === editorId ? 'block' : 'none';
             });
             
-            const editorNum = editorId.split('r').pop();
-
             const tab = document.querySelector(`#file .tab[onclick*="${editorId}"]`);
             if (tab) {
-                const fileExtension = tab.textContent.split('.').pop(); // Get the text after the last '.'
-                let extension = fileExtension;
-                if(extension != "py" && extension != "cpp"){
-                    extension = "text";
-                } 
-                let syntaxSelector = {cpp : 'text/x-c++src', py : 'python', text:'text/plain' }
-                var textEditor = CodeMirror.fromTextArea(document.getElementById(`textEditor${editorNum}`), {
-                    mode: syntaxSelector[extension],
-                    lineNumbers: true,
-                    theme: "material-darker",
-                    autoCloseBrackets: true,
-                    matchBrackets: true,
-                    indentUnit: 4,
-                    tabSize: 4,
-                    smartIndent: true,
-                    indentWithTabs: false,
-                });
+                fileExtension = tab.textContent.split('.').pop();   
             }
+            currentTextEditor = "textEditor"+editorId.split('r').pop();
         }
 
         let fileCount = 1; // Start from the current number of files
@@ -267,7 +252,31 @@
             newEditor.appendChild(newTextArea);
             textAreaDiv.appendChild(newEditor);
 
-            // Hide all other editors and show the new one
+            let syntaxSelector = {cpp : 'text/x-c++src', py : 'python', plain: 'text/plain' }
+            let fileExtension = fileName.split('.').pop();
+            if (!(fileExtension in syntaxSelector)){
+                fileExtension = 'plain';
+            }   
+
+            code =`
+        var textEditor${fileCount} = CodeMirror.fromTextArea(document.getElementById('textEditor${fileCount}'), {
+            mode: "${syntaxSelector[fileExtension]}",
+            lineNumbers: true,
+            theme: "material-darker",
+            autoCloseBrackets: true,
+            matchBrackets: true,
+            indentUnit: 4,
+            tabSize: 4,
+            smartIndent: true,
+            indentWithTabs: false,
+        });
+            `
+            const script = document.createElement('script');
+            script.textContent = code;
+            document.body.appendChild(script);
+            //const executeCode = new Function(code);
+            //executeCode();
+
             toggleEditor(newEditorId);
         }
 
@@ -306,11 +315,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/addon/edit/matchbrackets.min.js"></script>
 
     <script>
-        let syntaxSelector = {cpp : 'text/x-c++src', python : 'python' }
-        const lang = document.getElementById('language');
-
-        var textEditor = CodeMirror.fromTextArea(document.getElementById('textEditor'), {
-            mode: syntaxSelector[lang.value],
+        var textEditor1 = CodeMirror.fromTextArea(document.getElementById('textEditor1'), {
+            mode: "python",
             lineNumbers: true,
             theme: "material-darker",
             autoCloseBrackets: true,
@@ -332,27 +338,23 @@
             lineNumbers: false,
             theme: "material-darker",
         });
-
-        lang.addEventListener('change', () => {
-            textEditor.setOption('mode', syntaxSelector[lang.value]);
-        });
-
     </script>
     <script>
         async function fetchData() {
         console.log("fetchdata");
-
-        const code = textEditor.getValue();
+        console.log(typeof currentTextEditor)
+        console.log(currentTextEditor.getValue())
+        console.log(typeof textEditor)
+        const code = textEditor1.getValue();
         const input = inputArea.getValue();
-        const lang = document.getElementById('language').value;
 
-        console.log(lang)
+        console.log(code,input,fileExtension);
         const response = await fetch('/compile', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({codeVal:code,inputVal:input,langType:lang}),
+            body: JSON.stringify({codeVal:code,inputVal:input,langType:fileExtension}),
         });
 
         const data = await response.json();
