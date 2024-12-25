@@ -50,8 +50,7 @@ def handle_update(data):
 
 def code_exe(language,code,inputVal):
 
-	extension = {"python":".py","cpp":".cpp"}
-	fileName = language+"_code"+extension[language]
+	fileName = language+"_code."+language
 	sessionId = str(uuid.uuid4())
 
 	folderPath = os.path.join("temp", sessionId)

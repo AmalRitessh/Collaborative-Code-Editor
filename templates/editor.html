@@ -160,8 +160,9 @@
  <script>
         let activeTab = "file"; // Tracks the currently active tab
         let isRetracted = false; // Tracks whether ioAreaDiv is retracted
+        let editors = {};
+
         fileExtension = "py";
-        currentTextEditor = textEditor1;
 
         function toggleTab(tabId) {
             const ioAreaDiv = document.getElementById("ioAreaDiv");
@@ -202,17 +203,17 @@
         }// Track the current state of the ioAreaDiv
 
         function toggleEditor(editorId) {
-            const editors = document.querySelectorAll('#textAreaDiv > div');
-            editors.forEach(editor => {
+            const editorsDiv = document.querySelectorAll('#textAreaDiv > div');
+            editorsDiv.forEach(editor => {
                 editor.style.display = editor.id === editorId ? 'block' : 'none';
             });
-            
             const tab = document.querySelector(`#file .tab[onclick*="${editorId}"]`);
             if (tab) {
-                fileExtension = tab.textContent.split('.').pop();   
+                fileExtension = tab.textContent.split('.').pop();
             }
-            currentTextEditor = "textEditor"+editorId.split('r').pop();
+            currentTextEditor = editors[`textEditor${editorId.split('r').pop()}`];
         }
+
 
         let fileCount = 1; // Start from the current number of files
 
@@ -258,22 +259,20 @@
                 fileExtension = 'plain';
             }   
 
-            code =`
-        var textEditor${fileCount} = CodeMirror.fromTextArea(document.getElementById('textEditor${fileCount}'), {
-            mode: "${syntaxSelector[fileExtension]}",
-            lineNumbers: true,
-            theme: "material-darker",
-            autoCloseBrackets: true,
-            matchBrackets: true,
-            indentUnit: 4,
-            tabSize: 4,
-            smartIndent: true,
-            indentWithTabs: false,
-        });
-            `
-            const script = document.createElement('script');
-            script.textContent = code;
-            document.body.appendChild(script);
+
+            editors[`textEditor${fileCount}`] = CodeMirror.fromTextArea(document.getElementById(`textEditor${fileCount}`), {
+                mode: syntaxSelector[fileExtension],
+                lineNumbers: true,
+                theme: "material-darker",
+                autoCloseBrackets: true,
+                matchBrackets: true,
+                indentUnit: 4,
+                tabSize: 4,
+                smartIndent: true,
+                indentWithTabs: false,
+            });
+
+
             //const executeCode = new Function(code);
             //executeCode();
 
@@ -315,7 +314,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/addon/edit/matchbrackets.min.js"></script>
 
     <script>
-        var textEditor1 = CodeMirror.fromTextArea(document.getElementById('textEditor1'), {
+        editors[`textEditor1`] = CodeMirror.fromTextArea(document.getElementById('textEditor1'), {
             mode: "python",
             lineNumbers: true,
             theme: "material-darker",
@@ -326,6 +325,8 @@
             smartIndent: true,
             indentWithTabs: false,
         });
+
+        currentTextEditor = editors[`textEditor1`];
 
         var outputArea = CodeMirror.fromTextArea(document.getElementById('outputArea'), {
             mode: "text/plain",
@@ -345,7 +346,7 @@
         console.log(typeof currentTextEditor)
         console.log(currentTextEditor.getValue())
         console.log(typeof textEditor)
-        const code = textEditor1.getValue();
+        const code = currentTextEditor.getValue();
         const input = inputArea.getValue();
 
         console.log(code,input,fileExtension);
