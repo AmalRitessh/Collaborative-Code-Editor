@@ -204,12 +204,28 @@
             editors.forEach(editor => {
                 editor.style.display = editor.id === editorId ? 'block' : 'none';
             });
+            
+            const editorNum = editorId.split('r').pop();
 
             const tab = document.querySelector(`#file .tab[onclick*="${editorId}"]`);
             if (tab) {
-                const fileName = tab.textContent.split('*')[0].trim(); // Extract the file name before 'x'
-                const fileExtension = fileName.split('.').pop(); // Get the text after the last '.'
-                alert(fileExtension); // Alert the file extension
+                const fileExtension = tab.textContent.split('.').pop(); // Get the text after the last '.'
+                let extension = fileExtension;
+                if(extension != "py" && extension != "cpp"){
+                    extension = "text";
+                } 
+                let syntaxSelector = {cpp : 'text/x-c++src', py : 'python', text:'text/plain' }
+                var textEditor = CodeMirror.fromTextArea(document.getElementById(`textEditor${editorNum}`), {
+                    mode: syntaxSelector[extension],
+                    lineNumbers: true,
+                    theme: "material-darker",
+                    autoCloseBrackets: true,
+                    matchBrackets: true,
+                    indentUnit: 4,
+                    tabSize: 4,
+                    smartIndent: true,
+                    indentWithTabs: false,
+                });
             }
         }
 
@@ -243,7 +259,7 @@
             newEditor.id = newEditorId;
 
             const newTextArea = document.createElement('textarea');
-            newTextArea.id = "textEditor";
+            newTextArea.id = `textEditor${fileCount}`;
             newTextArea.name = "textEditor";
             newTextArea.rows = 100;
             newTextArea.cols = 100;
