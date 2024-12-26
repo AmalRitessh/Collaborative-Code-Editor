@@ -128,10 +128,6 @@
             </div>
 
             <div id="run" class="content hidden">
-                <select name="language" id="language">
-                    <option value="python">python</option>
-                    <option value="cpp">cpp</option>
-                </select>
                 <button onclick="fetchData()">Run</button>
                 <p>Input:</p>
                 <textarea id="inputArea" name="inputArea" rows="10" cols="10"></textarea>
@@ -293,6 +289,8 @@
             if (editorToDelete) {
                 editorToDelete.remove();
             }
+
+            delete editors[`textEditor${editorId.split('r').pop()}`]
 
             // Optionally, handle active tab switching
             const remainingTabs = document.querySelectorAll('#file .tab');

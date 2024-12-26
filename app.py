@@ -50,6 +50,9 @@ def handle_update(data):
 
 def code_exe(language,code,inputVal):
 
+	if language!= "cpp" and language!= "py":
+		return "error: Invalid File Extension\nUse cpp or py File Extensions."
+
 	fileName = language+"_code."+language
 	sessionId = str(uuid.uuid4())
 
