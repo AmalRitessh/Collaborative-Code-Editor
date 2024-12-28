@@ -66,7 +66,7 @@ def code_exe(language,code,inputVal):
 	f.close()
 
 	try:
-		if language == "python":
+		if language == "py":
 			execute = subprocess.run(["python3",filePath],timeout=10,input=inputVal,capture_output=True,text=True)
 			if execute.returncode!=0:
 				if os.path.exists(folderPath):
