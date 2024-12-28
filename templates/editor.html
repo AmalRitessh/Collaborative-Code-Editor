@@ -207,7 +207,7 @@
             if (tab) {
                 fileExtension = tab.textContent.split('.').pop();
             }
-            currentTextEditor = editors[`textEditor${editorId.split('r').pop()}`];
+            currentTextEditor = editors[`textEditor${editorId.split('r').pop()}`][0];
         }
 
 
@@ -255,25 +255,87 @@
                 fileExtension = 'plain';
             }   
 
+            let editor = [];
+            editor.push (CodeMirror.fromTextArea(document.getElementById(`textEditor${fileCount}`), {
+                            mode: syntaxSelector[fileExtension],
+                            lineNumbers: true,
+                            theme: "material-darker",
+                            autoCloseBrackets: true,
+                            matchBrackets: true,
+                            indentUnit: 4,
+                            tabSize: 4,
+                            smartIndent: true,
+                            indentWithTabs: false,
+                        }));
 
-            editors[`textEditor${fileCount}`] = CodeMirror.fromTextArea(document.getElementById(`textEditor${fileCount}`), {
-                mode: syntaxSelector[fileExtension],
-                lineNumbers: true,
-                theme: "material-darker",
-                autoCloseBrackets: true,
-                matchBrackets: true,
-                indentUnit: 4,
-                tabSize: 4,
-                smartIndent: true,
-                indentWithTabs: false,
-            });
+            editor.push(fileName);
 
-
-            //const executeCode = new Function(code);
-            //executeCode();
-
+            editors[`textEditor${fileCount}`] = editor;
             toggleEditor(newEditorId);
         }
+
+
+        function createFileByRequest() {
+            const fileName = window.prompt("Enter file name");
+            if (!fileName) return; // Exit if no file name is provided
+
+            fileCount++; // Increment the file counter
+            const newEditorId = `editor${fileCount}`;
+
+            // Add new tab to the file div
+            const fileDiv = document.getElementById('file');
+            const newTab = document.createElement('div');
+            const image = document.createElement('img');
+            image.setAttribute('src', `/static/img/cross.png`);
+            image.setAttribute('onclick',`deleteFile(event)`);
+            image.setAttribute('style',`width: 30px;`);
+            
+            newTab.className = "tab active";
+            newTab.setAttribute('onclick', `toggleEditor('${newEditorId}')`);
+            newTab.textContent = fileName;
+            
+            newTab.appendChild(image);
+            fileDiv.appendChild(newTab);
+
+            // Add new editor to the textAreaDiv
+            const textAreaDiv = document.getElementById('textAreaDiv');
+            const newEditor = document.createElement('div');
+            newEditor.id = newEditorId;
+
+            const newTextArea = document.createElement('textarea');
+            newTextArea.id = `textEditor${fileCount}`;
+            newTextArea.name = "textEditor";
+            newTextArea.rows = 100;
+            newTextArea.cols = 100;
+
+            newEditor.appendChild(newTextArea);
+            textAreaDiv.appendChild(newEditor);
+
+            let syntaxSelector = {cpp : 'text/x-c++src', py : 'python', plain: 'text/plain' }
+            let fileExtension = fileName.split('.').pop();
+            if (!(fileExtension in syntaxSelector)){
+                fileExtension = 'plain';
+            }   
+
+            let editor = [];
+            editor.push (CodeMirror.fromTextArea(document.getElementById(`textEditor${fileCount}`), {
+                            mode: syntaxSelector[fileExtension],
+                            lineNumbers: true,
+                            theme: "material-darker",
+                            autoCloseBrackets: true,
+                            matchBrackets: true,
+                            indentUnit: 4,
+                            tabSize: 4,
+                            smartIndent: true,
+                            indentWithTabs: false,
+                        }));
+
+            editor.push(fileName);
+
+            editors[`textEditor${fileCount}`] = editor;
+            toggleEditor(newEditorId);
+        }
+
 
         function deleteFile(event) {
             // Prevent triggering parent element's click event
@@ -312,7 +374,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/addon/edit/matchbrackets.min.js"></script>
 
     <script>
-        editors[`textEditor1`] = CodeMirror.fromTextArea(document.getElementById('textEditor1'), {
+        let editor = [];
+        editor.push(CodeMirror.fromTextArea(document.getElementById('textEditor1'), {
             mode: "python",
             lineNumbers: true,
             theme: "material-darker",
@@ -322,9 +385,12 @@
             tabSize: 4,
             smartIndent: true,
             indentWithTabs: false,
-        });
+        }));
 
-        currentTextEditor = editors[`textEditor1`];
+        editor.push("index.py");
+        editors[`textEditor1`] = editor;
+
+        currentTextEditor = editors[`textEditor1`][0];
 
         var outputArea = CodeMirror.fromTextArea(document.getElementById('outputArea'), {
             mode: "text/plain",
@@ -371,6 +437,24 @@
             window.hasRunOnce = true;
             socket.emit('join', { room: room_id });    
         }
+
+        socket.on('request_editors', (data) => {
+            let currentEditors = [];
+            for(let [key, values] of Object.entries(editors)){
+                let temp = [];
+                temp.push(key)
+                temp.push(values[0].getValue());
+                temp.push(values[1]);
+                currentEditors.push(temp);
+            }
+            socket.emit('requested_editors', { room: room_id, currentEditors});
+        });
+
+        socket.on('create_editors', (data) => {
+            if (data.room === room_id){
+
+            }
+        });
 
         // Respond to request for text
         socket.on('request_text', (data) => {
