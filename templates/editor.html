@@ -275,12 +275,10 @@
         }
 
 
-        function createFileByRequest() {
-            const fileName = window.prompt("Enter file name");
-            if (!fileName) return; // Exit if no file name is provided
-
-            fileCount++; // Increment the file counter
-            const newEditorId = `editor${fileCount}`;
+        function createFileByRequest(textEditorid, content, fileName) {
+    
+            let tempCount = textEditorid.split('r').pop()
+            const newEditorId = `editor${tempCount}`;
 
             // Add new tab to the file div
             const fileDiv = document.getElementById('file');
@@ -303,7 +301,7 @@
             newEditor.id = newEditorId;
 
             const newTextArea = document.createElement('textarea');
-            newTextArea.id = `textEditor${fileCount}`;
+            newTextArea.id = `textEditor${tempCount}`;
             newTextArea.name = "textEditor";
             newTextArea.rows = 100;
             newTextArea.cols = 100;
@@ -318,7 +316,7 @@
             }   
 
             let editor = [];
-            editor.push (CodeMirror.fromTextArea(document.getElementById(`textEditor${fileCount}`), {
+            editor.push (CodeMirror.fromTextArea(document.getElementById(`textEditor${tempCount}`), {
                             mode: syntaxSelector[fileExtension],
                             lineNumbers: true,
                             theme: "material-darker",
@@ -331,8 +329,9 @@
                         }));
 
             editor.push(fileName);
+            editor[0].setValue(content);
 
-            editors[`textEditor${fileCount}`] = editor;
+            editors[`textEditor${tempCount}`] = editor;
             toggleEditor(newEditorId);
         }
 
@@ -439,6 +438,7 @@
         }
 
         socket.on('request_editors', (data) => {
+            console.log("request_editorst");
             let currentEditors = [];
             for(let [key, values] of Object.entries(editors)){
                 let temp = [];
@@ -447,12 +447,22 @@
                 temp.push(values[1]);
                 currentEditors.push(temp);
             }
-            socket.emit('requested_editors', { room: room_id, currentEditors});
+            console.log(currentEditors)
+            if(!(currentEditors.length === 1 && 
+          currentEditors[0][1] === "#hello1" && 
+          currentEditors[0][2] === "index.py")){
+                socket.emit('requested_editors', { room: room_id, currentEditors, fileCount});
+            }
+            
         });
 
         socket.on('create_editors', (data) => {
+            console.log("create_editors");
+            fileCount = data.fileCount;
             if (data.room === room_id){
-
+                for(let sublist of data.currentEditors){
+                    createFileByRequest(sublist[0],sublist[1],sublist[2]);
+                }
             }
         });
 
