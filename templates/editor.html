@@ -198,7 +198,7 @@
             activeTab = tabId;
         }// Track the current state of the ioAreaDiv
 
-        function toggleEditor(editorId) {
+        function toggleEditor(editorId) {         
             const editorsDiv = document.querySelectorAll('#textAreaDiv > div');
             editorsDiv.forEach(editor => {
                 editor.style.display = editor.id === editorId ? 'block' : 'none';
@@ -208,6 +208,9 @@
                 fileExtension = tab.textContent.split('.').pop();
             }
             currentTextEditor = editors[`textEditor${editorId.split('r').pop()}`][0];
+            currentTextEditorName = `textEditor${editorId.split('r').pop()}`;
+            
+            currentTextEditor.setCursor({ line: 0, ch: 0 });
         }
 
 
@@ -269,6 +272,12 @@
                         }));
 
             editor.push(fileName);
+            editor.push(editor[0].on('change', () => {
+                        console.log('change');
+                        if (isProgrammaticChange) return;
+                        const text = currentTextEditor.getValue();
+                        socket.emit('update_text', { room: room_id, text, currentTextEditorName });
+                    }));
 
             editors[`textEditor${fileCount}`] = editor;
             toggleEditor(newEditorId);
@@ -330,6 +339,13 @@
 
             editor.push(fileName);
             editor[0].setValue(content);
+            editor.push(editor[0].on('change', () => {
+                        console.log('change');
+                        if (isProgrammaticChange) return;
+                        const text = currentTextEditor.getValue();
+                        socket.emit('update_text', { room: room_id, text, currentTextEditorName });
+                    }));
+            
 
             editors[`textEditor${tempCount}`] = editor;
             toggleEditor(newEditorId);
@@ -359,7 +375,6 @@
             // Find the tab and editor associated with the delete button
             const tabToDelete = event.target.parentElement;
             const editorId = tabToDelete.getAttribute('onclick').match(/'([^']+)'/)[1]; // Extract the editor ID
-            console.log(tabToDelete.getAttribute('onclick'));
             const editorToDelete = document.getElementById(editorId);
 
             // Remove the tab and editor
@@ -375,11 +390,7 @@
             }
         }
 
-
-
     </script>
-
-
     <!-- CodeMirror JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/mode/clike/clike.min.js"></script>
@@ -402,9 +413,18 @@
         }));
 
         editor.push("index.py");
+        
+        editor.push(editor[0].on('change', () => {
+                        console.log('change');
+                        if (isProgrammaticChange) return;
+                        const text = currentTextEditor.getValue();
+                        socket.emit('update_text', { room: room_id, text, currentTextEditorName });
+                    }));
+
         editors[`textEditor1`] = editor;
 
         currentTextEditor = editors[`textEditor1`][0];
+        currentTextEditorName = `textEditor1`;
 
         var outputArea = CodeMirror.fromTextArea(document.getElementById('outputArea'), {
             mode: "text/plain",
@@ -497,17 +517,11 @@
         // Receive and update editor text
         socket.on('update_text', (data) => {
             isProgrammaticChange = true;
-            const cursor = textEditor.getCursor();
-            textEditor.setValue(data.text);
-            textEditor.setCursor(cursor);
+            let tempTextEditor = editors[data.currentTextEditorName][0];
+            const cursor = tempTextEditor.getCursor();
+            tempTextEditor.setValue(data.text);
+            tempTextEditor.setCursor(cursor);
             isProgrammaticChange = false;
-        });
-
-        // Send updates to the server on input change
-        textEditor.on('change', () => {
-            if (isProgrammaticChange) return;
-            const text = textEditor.getValue();
-            socket.emit('update_text', { room: room_id, text });
         });
 
     </script>

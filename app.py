@@ -57,7 +57,8 @@ def requested_editors(data):
 def handle_update(data):
     room = data['room']
     text = data['text']
-    emit('update_text', {'text': text}, to = room, skip_sid = True)   # Broadcast to all users
+    currentTextEditorName = data['currentTextEditorName']
+    emit('update_text', {'text': text, 'currentTextEditorName':currentTextEditorName}, to = room, skip_sid = True)   # Broadcast to all users
 
 def code_exe(language,code,inputVal):
 
