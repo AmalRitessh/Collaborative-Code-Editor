@@ -335,6 +335,22 @@
             toggleEditor(newEditorId);
         }
 
+        function deleteFileByRequest(){
+            const fileDiv = document.getElementById('file');
+            Array.from(fileDiv.children).forEach(child => {
+              if (child.tagName === 'DIV') {
+                child.remove(); // Remove divs
+              }
+            });
+
+            // Remove all divs inside #textAreaDiv
+            const textAreaDiv = document.getElementById('textAreaDiv');
+            while (textAreaDiv.firstChild) {
+              textAreaDiv.firstChild.remove();
+            }
+
+            editors = {};
+        }
 
         function deleteFile(event) {
             // Prevent triggering parent element's click event
@@ -343,13 +359,12 @@
             // Find the tab and editor associated with the delete button
             const tabToDelete = event.target.parentElement;
             const editorId = tabToDelete.getAttribute('onclick').match(/'([^']+)'/)[1]; // Extract the editor ID
+            console.log(tabToDelete.getAttribute('onclick'));
             const editorToDelete = document.getElementById(editorId);
 
             // Remove the tab and editor
             tabToDelete.remove();
-            if (editorToDelete) {
-                editorToDelete.remove();
-            }
+            editorToDelete.remove();
 
             delete editors[`textEditor${editorId.split('r').pop()}`]
 
@@ -458,6 +473,7 @@
 
         socket.on('create_editors', (data) => {
             console.log("create_editors");
+            deleteFileByRequest();
             fileCount = data.fileCount;
             if (data.room === room_id){
                 for(let sublist of data.currentEditors){
