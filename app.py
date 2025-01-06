@@ -60,6 +60,14 @@ def handle_update(data):
     currentTextEditorName = data['currentTextEditorName']
     emit('update_text', {'text': text, 'currentTextEditorName':currentTextEditorName}, to = room, skip_sid = True)   # Broadcast to all users
 
+@socketio.on('create_new_file')
+def create_new_file(data):
+	print("create_new_file in app.py")
+	room = data['room']
+	fileCount = data['fileCount']
+	fileName = data['fileName']
+	emit('create_new_file', {'room':room,'fileCount': fileCount, 'fileName': fileName}, to = room ,skip_sid = True)
+
 def code_exe(language,code,inputVal):
 
 	if language!= "cpp" and language!= "py":

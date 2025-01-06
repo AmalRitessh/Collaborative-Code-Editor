@@ -280,6 +280,7 @@
                     }));
 
             editors[`textEditor${fileCount}`] = editor;
+            socket.emit('create_new_file', {'room':room_id,'fileCount': fileCount, 'fileName': fileName});
             toggleEditor(newEditorId);
         }
 
@@ -472,6 +473,14 @@
             socket.emit('join', { room: room_id });    
         }
 
+        socket.on('create_new_file', (data)=>{
+            console.log('create_new_file in editors');
+            if ((data.room === room_id) && (!(`textEditor${data.fileCount}` in editors))){
+                fileCount = data.fileCount;
+                createFileByRequest(`textEditor${data.fileCount}`,"", data.fileName);
+            }
+        })
+
         socket.on('request_editors', (data) => {
             console.log("request_editorst");
             let currentEditors = [];
@@ -493,9 +502,9 @@
 
         socket.on('create_editors', (data) => {
             console.log("create_editors");
-            deleteFileByRequest();
-            fileCount = data.fileCount;
             if (data.room === room_id){
+                deleteFileByRequest();
+                fileCount = data.fileCount;
                 for(let sublist of data.currentEditors){
                     createFileByRequest(sublist[0],sublist[1],sublist[2]);
                 }
