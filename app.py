@@ -68,6 +68,12 @@ def create_new_file(data):
 	fileName = data['fileName']
 	emit('create_new_file', {'room':room,'fileCount': fileCount, 'fileName': fileName}, to = room ,skip_sid = True)
 
+@socketio.on('delete_file')
+def delete_file(data):
+	room = data['room']
+	editorId = data['editorId']
+	emit('delete_file',{'room':room, 'editorId':editorId}, to = room, skip_sid = True)
+
 def code_exe(language,code,inputVal):
 
 	if language!= "cpp" and language!= "py":

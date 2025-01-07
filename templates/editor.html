@@ -124,7 +124,7 @@
 
             <div id="file" class="content">
                 <button onclick="createFile()">file</button>
-                <div class="tab active" onclick="toggleEditor('editor1')">index.py<img src="/static/img/cross.png" onclick="deleteFile(event)" style = "width: 30px;"></div>
+                <div id="file1" class="tab active" onclick="toggleEditor('editor1')">index.py<img src="/static/img/cross.png" onclick="deleteFile('editor1')" style = "width: 30px;"></div>
             </div>
 
             <div id="run" class="content hidden">
@@ -145,7 +145,7 @@
         <div id="textAreaDiv">
 
             <div id="editor1">
-                <textarea id="textEditor1" name="textEditor" rows="100" cols="100">#hello1</textarea>
+                <textarea id="textEditor1" rows="100" cols="100">#hello1</textarea>
             </div>
 
         </div>
@@ -228,9 +228,10 @@
             const newTab = document.createElement('div');
             const image = document.createElement('img');
             image.setAttribute('src', `/static/img/cross.png`);
-            image.setAttribute('onclick',`deleteFile(event)`);
+            image.setAttribute('onclick',`deleteFile('editor${fileCount}')`);
             image.setAttribute('style',`width: 30px;`);
             
+            newTab.id = `file${fileCount}`;
             newTab.className = "tab active";
             newTab.setAttribute('onclick', `toggleEditor('${newEditorId}')`);
             newTab.textContent = fileName;
@@ -245,7 +246,6 @@
 
             const newTextArea = document.createElement('textarea');
             newTextArea.id = `textEditor${fileCount}`;
-            newTextArea.name = "textEditor";
             newTextArea.rows = 100;
             newTextArea.cols = 100;
 
@@ -295,9 +295,10 @@
             const newTab = document.createElement('div');
             const image = document.createElement('img');
             image.setAttribute('src', `/static/img/cross.png`);
-            image.setAttribute('onclick',`deleteFile(event)`);
+            image.setAttribute('onclick',`deleteFile('editor${tempCount}')`);
             image.setAttribute('style',`width: 30px;`);
             
+            newTab.id = `file${tempCount}`;
             newTab.className = "tab active";
             newTab.setAttribute('onclick', `toggleEditor('${newEditorId}')`);
             newTab.textContent = fileName;
@@ -312,7 +313,6 @@
 
             const newTextArea = document.createElement('textarea');
             newTextArea.id = `textEditor${tempCount}`;
-            newTextArea.name = "textEditor";
             newTextArea.rows = 100;
             newTextArea.cols = 100;
 
@@ -351,33 +351,15 @@
             editors[`textEditor${tempCount}`] = editor;
         }
 
-        function deleteFileByRequest(){
-            const fileDiv = document.getElementById('file');
-            Array.from(fileDiv.children).forEach(child => {
-              if (child.tagName === 'DIV') {
-                child.remove(); // Remove divs
-              }
-            });
 
-            // Remove all divs inside #textAreaDiv
-            const textAreaDiv = document.getElementById('textAreaDiv');
-            while (textAreaDiv.firstChild) {
-              textAreaDiv.firstChild.remove();
-            }
+        function deleteFile(editorId) {
 
-            editors = {};
-        }
-
-        function deleteFile(event) {
-            // Prevent triggering parent element's click event
-            event.stopPropagation();
-
-            // Find the tab and editor associated with the delete button
-            const tabToDelete = event.target.parentElement;
-            const editorId = tabToDelete.getAttribute('onclick').match(/'([^']+)'/)[1]; // Extract the editor ID
+            console.log(editorId);
+            const tabToDelete = document.getElementById(`file${editorId.split('r').pop()}`);
+            console.log(tabToDelete);
             const editorToDelete = document.getElementById(editorId);
+            console.log(editorToDelete);
 
-            // Remove the tab and editor
             tabToDelete.remove();
             editorToDelete.remove();
 
@@ -385,9 +367,14 @@
 
             // Optionally, handle active tab switching
             const remainingTabs = document.querySelectorAll('#file .tab');
+            console.log(remainingTabs);
             if (remainingTabs.length > 0) {
+                console.log("remaining tabs");
                 remainingTabs[0].click(); // Activate the first remaining tab
             }
+
+            socket.emit('delete_file',{'room': room_id,'editorId':editorId});
+
         }
 
     </script>
@@ -480,6 +467,11 @@
             }
         })
 
+        socket.on('delete_file', (data) => {
+            if (data.room === room_id){
+                deleteFile(data.editorId);
+            }
+        })
         socket.on('request_editors', (data) => {
             console.log("request_editorst");
             let currentEditors = [];
@@ -512,7 +504,7 @@
             if ((data.room === room_id) && (currentEditors.length === 1 && 
           currentEditors[0][1] === "#hello1" && 
           currentEditors[0][2] === "index.py")){
-                deleteFileByRequest();
+                deleteFile('editor1');
                 fileCount = data.fileCount;
                 for(let sublist of data.currentEditors){
                     createFileByRequest(sublist[0],sublist[1],sublist[2]);
