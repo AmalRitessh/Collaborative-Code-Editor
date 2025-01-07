@@ -349,7 +349,6 @@
             
 
             editors[`textEditor${tempCount}`] = editor;
-            toggleEditor(newEditorId);
         }
 
         function deleteFileByRequest(){
@@ -502,12 +501,25 @@
 
         socket.on('create_editors', (data) => {
             console.log("create_editors");
-            if (data.room === room_id){
+            let currentEditors = [];
+            for(let [key, values] of Object.entries(editors)){
+                let temp = [];
+                temp.push(key)
+                temp.push(values[0].getValue());
+                temp.push(values[1]);
+                currentEditors.push(temp);
+            }
+            if ((data.room === room_id) && (currentEditors.length === 1 && 
+          currentEditors[0][1] === "#hello1" && 
+          currentEditors[0][2] === "index.py")){
                 deleteFileByRequest();
                 fileCount = data.fileCount;
                 for(let sublist of data.currentEditors){
                     createFileByRequest(sublist[0],sublist[1],sublist[2]);
                 }
+
+                let firstEditor =`editor${Object.keys(editors)[0].split('r').pop()}`; 
+                toggleEditor(firstEditor);
             }
         });
 
