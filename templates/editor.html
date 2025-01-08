@@ -60,6 +60,17 @@
             min-width: 300px;
 
         }
+
+        #popup {
+            position: absolute;
+            display: none;
+            background-color: white;
+            border: 1px solid #ccc;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            padding: 10px;
+        }
+
         .hidden {
             display: none;
         }
@@ -124,7 +135,9 @@
 
             <div id="file" class="content">
                 <button onclick="createFile()">file</button>
-                <div id="file1" class="tab active" onclick="toggleEditor('editor1')">index.py<img src="/static/img/cross.png" onclick="deleteFile('editor1')" style = "width: 30px;"></div>
+                <div id="file1" name="files" class="tab active" onclick="toggleEditor('editor1')" oncontextmenu="popupMenu('event')" >
+                    index.py
+                </div>
             </div>
 
             <div id="run" class="content hidden">
@@ -151,6 +164,10 @@
         </div>
         </div>
     </div>
+    <div id="popup" class="popup">
+        <button onclick="deleteFile()">Delete</button>
+    </div>
+
  
 
  <script>
@@ -159,6 +176,28 @@
         let editors = {};
 
         fileExtension = "py";
+
+        let currentDivOfFile = null; // To store the currently clicked parent div
+
+        function popupMenu(event){
+            console.log("pop");
+            event.preventDefault(); // Prevent the default context menu
+
+            // Set the current div to the one clicked
+            currentDivOfFile = event.target.getAttribute('id');
+
+            // Position the popup menu at the cursor location
+            popup.style.left = `${event.pageX}px`;
+            popup.style.top = `${event.pageY}px`;
+
+            // Show the popup menu
+            popup.style.display = 'block';
+        }
+
+        // Hide the popup when clicking elsewhere
+        document.addEventListener('click', () => {
+            popup.style.display = 'none';
+        });
 
         function toggleTab(tabId) {
             const ioAreaDiv = document.getElementById("ioAreaDiv");
@@ -226,17 +265,14 @@
             // Add new tab to the file div
             const fileDiv = document.getElementById('file');
             const newTab = document.createElement('div');
-            const image = document.createElement('img');
-            image.setAttribute('src', `/static/img/cross.png`);
-            image.setAttribute('onclick',`deleteFile('editor${fileCount}')`);
-            image.setAttribute('style',`width: 30px;`);
             
             newTab.id = `file${fileCount}`;
             newTab.className = "tab active";
+            newTab.name = "files";
             newTab.setAttribute('onclick', `toggleEditor('${newEditorId}')`);
+            newTab.setAttribute('oncontextmenu', `deleteFile('${newEditorId}')`);
             newTab.textContent = fileName;
             
-            newTab.appendChild(image);
             fileDiv.appendChild(newTab);
 
             // Add new editor to the textAreaDiv
@@ -293,17 +329,14 @@
             // Add new tab to the file div
             const fileDiv = document.getElementById('file');
             const newTab = document.createElement('div');
-            const image = document.createElement('img');
-            image.setAttribute('src', `/static/img/cross.png`);
-            image.setAttribute('onclick',`deleteFile('editor${tempCount}')`);
-            image.setAttribute('style',`width: 30px;`);
-            
+
             newTab.id = `file${tempCount}`;
             newTab.className = "tab active";
+            newTab.name = "files";
             newTab.setAttribute('onclick', `toggleEditor('${newEditorId}')`);
+            newTab.setAttribute('oncontextmenu', `deleteFile('${newEditorId}')`);
             newTab.textContent = fileName;
             
-            newTab.appendChild(image);
             fileDiv.appendChild(newTab);
 
             // Add new editor to the textAreaDiv
