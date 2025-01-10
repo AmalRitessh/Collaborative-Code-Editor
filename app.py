@@ -74,6 +74,13 @@ def delete_file(data):
 	fileId = data['fileId']
 	emit('delete_file',{'room':room, 'fileId':fileId}, to = room, skip_sid = True)
 
+@socketio.on('rename_file')
+def rename_file(data):
+	room = data['room']
+	fileId = data['fileId']
+	newFileName = data['newFileName']
+	emit('rename_file',{'room':room, 'fileId':fileId, 'newFileName':newFileName}, to = room, skip_sid = True)
+
 def code_exe(language,code,inputVal):
 
 	if language!= "cpp" and language!= "py":

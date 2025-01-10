@@ -166,6 +166,7 @@
     </div>
     <div id="popup" class="popup">
         <button onclick="deleteFile()">Delete</button>
+        <button onclick="renameFile()">Rename</button>
     </div>
 
  
@@ -426,6 +427,77 @@
             }   
         }
 
+        function renameFile(){
+            const newFileName = window.prompt("Enter new file name:", editors[`textEditor${currentDivOfFile.split('e').pop()}`][1]);
+             if (!(newFileName)){
+                return
+             }
+            editors[`textEditor${currentDivOfFile.split('e').pop()}`][1] = newFileName;
+            const fileDiv = document.getElementById(currentDivOfFile);
+            fileDiv.textContent = newFileName;
+
+            const codeMirrorDivs = document.querySelectorAll(`#editor${currentDivOfFile.split('e').pop()} > div`);
+            codeMirrorDivs.forEach(codeMirrorDiv => {
+                if (codeMirrorDiv.className === "CodeMirror cm-s-material-darker"){
+                    codeMirrorDiv.remove();
+                }
+            });
+
+            let syntaxSelector = {cpp : 'text/x-c++src', py : 'python', plain: 'text/plain' }
+            let fileExtension = newFileName.split('.').pop();
+            if (!(fileExtension in syntaxSelector)){
+                fileExtension = 'plain';
+            }   
+
+            editors[`textEditor${currentDivOfFile.split('e').pop()}`][0] = (CodeMirror.fromTextArea(document.getElementById(`textEditor${currentDivOfFile.split('e').pop()}`), {
+                            mode: syntaxSelector[fileExtension],
+                            lineNumbers: true,
+                            theme: "material-darker",
+                            autoCloseBrackets: true,
+                            matchBrackets: true,
+                            indentUnit: 4,
+                            tabSize: 4,
+                            smartIndent: true,
+                            indentWithTabs: false,
+                        }));
+
+
+
+            socket.emit('rename_file',{'room': room_id,'fileId':currentDivOfFile, 'newFileName':newFileName});
+        }
+
+        function renameFileByRequest(fileId, newFileName){
+            editors[`textEditor${fileId.split('e').pop()}`][1] = newFileName;
+            const fileDiv = document.getElementById(fileId);
+            fileDiv.textContent = newFileName;
+
+            const codeMirrorDivs = document.querySelectorAll(`#editor${fileId.split('e').pop()} > div`);
+            codeMirrorDivs.forEach(codeMirrorDiv => {
+                if (codeMirrorDiv.className === "CodeMirror cm-s-material-darker"){
+                    codeMirrorDiv.remove();
+                }
+            });
+
+            let syntaxSelector = {cpp : 'text/x-c++src', py : 'python', plain: 'text/plain' }
+            let fileExtension = newFileName.split('.').pop();
+            if (!(fileExtension in syntaxSelector)){
+                fileExtension = 'plain';
+            }   
+
+            editors[`textEditor${fileId.split('e').pop()}`][0] = (CodeMirror.fromTextArea(document.getElementById(`textEditor${fileId.split('e').pop()}`), {
+                            mode: syntaxSelector[fileExtension],
+                            lineNumbers: true,
+                            theme: "material-darker",
+                            autoCloseBrackets: true,
+                            matchBrackets: true,
+                            indentUnit: 4,
+                            tabSize: 4,
+                            smartIndent: true,
+                            indentWithTabs: false,
+                        }));
+
+        }
+
     </script>
     <!-- CodeMirror JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/codemirror.min.js"></script>
@@ -517,9 +589,14 @@
         })
 
         socket.on('delete_file', (data) => {
-            console.log("amal was here")
             if (data.room === room_id){
                 deleteFileByRequest(data.fileId);
+            }
+        })
+
+        socket.on('rename_file', (data) => {
+            if (data.room === room_id){
+                renameFileByRequest(data.fileId, data.newFileName);
             }
         })
 
