@@ -71,8 +71,8 @@ def create_new_file(data):
 @socketio.on('delete_file')
 def delete_file(data):
 	room = data['room']
-	editorId = data['editorId']
-	emit('delete_file',{'room':room, 'editorId':editorId}, to = room, skip_sid = True)
+	fileId = data['fileId']
+	emit('delete_file',{'room':room, 'fileId':fileId}, to = room, skip_sid = True)
 
 def code_exe(language,code,inputVal):
 

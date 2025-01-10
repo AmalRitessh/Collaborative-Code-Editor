@@ -135,7 +135,7 @@
 
             <div id="file" class="content">
                 <button onclick="createFile()">file</button>
-                <div id="file1" name="files" class="tab active" onclick="toggleEditor('editor1')" oncontextmenu="popupMenu('event')" >
+                <div id="file1" class="tab active" onclick="toggleEditor('editor1')" oncontextmenu="popupMenu(event)" >
                     index.py
                 </div>
             </div>
@@ -268,9 +268,8 @@
             
             newTab.id = `file${fileCount}`;
             newTab.className = "tab active";
-            newTab.name = "files";
             newTab.setAttribute('onclick', `toggleEditor('${newEditorId}')`);
-            newTab.setAttribute('oncontextmenu', `deleteFile('${newEditorId}')`);
+            newTab.setAttribute('oncontextmenu', `popupMenu(event)`);
             newTab.textContent = fileName;
             
             fileDiv.appendChild(newTab);
@@ -332,9 +331,8 @@
 
             newTab.id = `file${tempCount}`;
             newTab.className = "tab active";
-            newTab.name = "files";
             newTab.setAttribute('onclick', `toggleEditor('${newEditorId}')`);
-            newTab.setAttribute('oncontextmenu', `deleteFile('${newEditorId}')`);
+            newTab.setAttribute('oncontextmenu', `popupMenu(event)`);
             newTab.textContent = fileName;
             
             fileDiv.appendChild(newTab);
@@ -385,18 +383,39 @@
         }
 
 
-        function deleteFile(editorId) {
+        function deleteFile() {
 
-            console.log(editorId);
-            const tabToDelete = document.getElementById(`file${editorId.split('r').pop()}`);
-            console.log(tabToDelete);
-            const editorToDelete = document.getElementById(editorId);
-            console.log(editorToDelete);
+            const userConfirmed = confirm("Are you sure you want to delete file?");
+            if (userConfirmed){
+                const tabToDelete = document.getElementById(`file${currentDivOfFile.split('e').pop()}`);
+                const editorToDelete = document.getElementById(`editor${currentDivOfFile.split('e').pop()}`);
+
+                tabToDelete.remove();
+                editorToDelete.remove();
+
+                delete editors[`textEditor${currentDivOfFile.split('e').pop()}`]
+
+                // Optionally, handle active tab switching
+                const remainingTabs = document.querySelectorAll('#file .tab');
+                console.log(remainingTabs);
+                if (remainingTabs.length > 0) {
+                    console.log("remaining tabs");
+                    remainingTabs[0].click(); // Activate the first remaining tab
+                }
+
+                socket.emit('delete_file',{'room': room_id,'fileId':currentDivOfFile});    
+            }
+        }
+
+        function deleteFileByRequest(fileId) {
+
+            const tabToDelete = document.getElementById(`file${fileId.split('e').pop()}`);
+            const editorToDelete = document.getElementById(`editor${fileId.split('e').pop()}`);
 
             tabToDelete.remove();
             editorToDelete.remove();
 
-            delete editors[`textEditor${editorId.split('r').pop()}`]
+            delete editors[`textEditor${fileId.split('e').pop()}`]
 
             // Optionally, handle active tab switching
             const remainingTabs = document.querySelectorAll('#file .tab');
@@ -404,10 +423,7 @@
             if (remainingTabs.length > 0) {
                 console.log("remaining tabs");
                 remainingTabs[0].click(); // Activate the first remaining tab
-            }
-
-            socket.emit('delete_file',{'room': room_id,'editorId':editorId});
-
+            }   
         }
 
     </script>
@@ -501,10 +517,12 @@
         })
 
         socket.on('delete_file', (data) => {
+            console.log("amal was here")
             if (data.room === room_id){
-                deleteFile(data.editorId);
+                deleteFileByRequest(data.fileId);
             }
         })
+
         socket.on('request_editors', (data) => {
             console.log("request_editorst");
             let currentEditors = [];
@@ -537,7 +555,7 @@
             if ((data.room === room_id) && (currentEditors.length === 1 && 
           currentEditors[0][1] === "#hello1" && 
           currentEditors[0][2] === "index.py")){
-                deleteFile('editor1');
+                deleteFileByRequest('file1');
                 fileCount = data.fileCount;
                 for(let sublist of data.currentEditors){
                     createFileByRequest(sublist[0],sublist[1],sublist[2]);
