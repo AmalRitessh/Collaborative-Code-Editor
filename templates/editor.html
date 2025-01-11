@@ -175,11 +175,11 @@
         let activeTab = "file"; // Tracks the currently active tab
         let isRetracted = false; // Tracks whether ioAreaDiv is retracted
         let editors = {};
-
+        let fileCount = 1; // Start from the current number of files
+        let currentDivOfFile = null; // To store the currently clicked parent div
         fileExtension = "py";
 
-        let currentDivOfFile = null; // To store the currently clicked parent div
-
+        
         function popupMenu(event){
             console.log("pop");
             event.preventDefault(); // Prevent the default context menu
@@ -252,9 +252,6 @@
             
             currentTextEditor.setCursor({ line: 0, ch: 0 });
         }
-
-
-        let fileCount = 1; // Start from the current number of files
 
         function createFile() {
             const fileName = window.prompt("Enter file name");
@@ -429,14 +426,21 @@
 
         function renameFile(){
             const newFileName = window.prompt("Enter new file name:", editors[`textEditor${currentDivOfFile.split('e').pop()}`][1]);
-             if (!(newFileName)){
+            
+            if (!(newFileName)){
                 return
-             }
-            editors[`textEditor${currentDivOfFile.split('e').pop()}`][1] = newFileName;
+            }
+
+
+            const tempCount = currentDivOfFile.split('e').pop();
+            const tempContents = editors[`textEditor${tempCount}`][0].getValue()
+
+            editors[`textEditor${tempCount}`][1] = newFileName;
+
             const fileDiv = document.getElementById(currentDivOfFile);
             fileDiv.textContent = newFileName;
 
-            const codeMirrorDivs = document.querySelectorAll(`#editor${currentDivOfFile.split('e').pop()} > div`);
+            const codeMirrorDivs = document.querySelectorAll(`#editor${tempCount} > div`);
             codeMirrorDivs.forEach(codeMirrorDiv => {
                 if (codeMirrorDiv.className === "CodeMirror cm-s-material-darker"){
                     codeMirrorDiv.remove();
@@ -449,7 +453,7 @@
                 fileExtension = 'plain';
             }   
 
-            editors[`textEditor${currentDivOfFile.split('e').pop()}`][0] = (CodeMirror.fromTextArea(document.getElementById(`textEditor${currentDivOfFile.split('e').pop()}`), {
+            editors[`textEditor${tempCount}`][0] = (CodeMirror.fromTextArea(document.getElementById(`textEditor${tempCount}`), {
                             mode: syntaxSelector[fileExtension],
                             lineNumbers: true,
                             theme: "material-darker",
@@ -461,17 +465,31 @@
                             indentWithTabs: false,
                         }));
 
+            editors[`textEditor${tempCount}`][0].setValue(tempContents);
 
+            editors[`textEditor${tempCount}`][2] = editors[`textEditor${tempCount}`][0].on('change', () => {
+                        console.log('change');
+                        if (isProgrammaticChange) return;
+                        const text = currentTextEditor.getValue();
+                        socket.emit('update_text', { room: room_id, text, currentTextEditorName });
+                    });
+
+            toggleEditor(`editor${tempCount}`);
 
             socket.emit('rename_file',{'room': room_id,'fileId':currentDivOfFile, 'newFileName':newFileName});
         }
 
         function renameFileByRequest(fileId, newFileName){
-            editors[`textEditor${fileId.split('e').pop()}`][1] = newFileName;
+
+            const tempCount = fileId.split('e').pop();
+            const tempContents = editors[`textEditor${tempCount}`][0].getValue()
+
+            editors[`textEditor${tempCount}`][1] = newFileName;
+
             const fileDiv = document.getElementById(fileId);
             fileDiv.textContent = newFileName;
 
-            const codeMirrorDivs = document.querySelectorAll(`#editor${fileId.split('e').pop()} > div`);
+            const codeMirrorDivs = document.querySelectorAll(`#editor${tempCount} > div`);
             codeMirrorDivs.forEach(codeMirrorDiv => {
                 if (codeMirrorDiv.className === "CodeMirror cm-s-material-darker"){
                     codeMirrorDiv.remove();
@@ -484,7 +502,7 @@
                 fileExtension = 'plain';
             }   
 
-            editors[`textEditor${fileId.split('e').pop()}`][0] = (CodeMirror.fromTextArea(document.getElementById(`textEditor${fileId.split('e').pop()}`), {
+            editors[`textEditor${tempCount}`][0] = (CodeMirror.fromTextArea(document.getElementById(`textEditor${tempCount}`), {
                             mode: syntaxSelector[fileExtension],
                             lineNumbers: true,
                             theme: "material-darker",
@@ -496,6 +514,16 @@
                             indentWithTabs: false,
                         }));
 
+            editors[`textEditor${tempCount}`][0].setValue(tempContents);
+
+            editors[`textEditor${tempCount}`][2] = editors[`textEditor${tempCount}`][0].on('change', () => {
+                        console.log('change');
+                        if (isProgrammaticChange) return;
+                        const text = currentTextEditor.getValue();
+                        socket.emit('update_text', { room: room_id, text, currentTextEditorName });
+                    });
+
+            toggleEditor(`editor${tempCount}`);
         }
 
     </script>
