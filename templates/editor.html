@@ -108,6 +108,16 @@
             display: flex;
             height: 88%;
         }
+
+        #download{
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            padding: 10px;
+            display: flex;
+            height: 100;
+
+        }
     </style>
     
 </head>
@@ -135,6 +145,7 @@
 
             <div id="file" class="content">
                 <button onclick="createFile()">file</button>
+                <button id="download "onclick="downloadFile()">download</button> 
                 <div id="file1" class="tab active" onclick="toggleEditor('editor1')" oncontextmenu="popupMenu(event)" >
                     index.py
                 </div>
@@ -175,10 +186,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/mode/python/python.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/addon/edit/closebrackets.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/addon/edit/matchbrackets.min.js"></script>
-
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.js"></script>
-
     <script src="{{ url_for('static', filename ='js/script.js') }}"></script>
 
 </body>
