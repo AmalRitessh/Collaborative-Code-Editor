@@ -160,8 +160,7 @@
             </div>
 
             <div id="users" class="content hidden">
-                <p>This is the Users Tab content. Add user-related functionality here.</p>
-                <a href="{{ url_for('index')}}">home</a>
+                <div>{{ userName }}</div>
             </div>
 
         </div>
@@ -188,6 +187,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/addon/edit/matchbrackets.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.js"></script>
+    <script>
+        const room_id = "{{ room_id }}";
+        const userName = "{{ userName }}";
+    </script>
     <script src="{{ url_for('static', filename ='js/script.js') }}"></script>
 
 </body>

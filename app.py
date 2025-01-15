@@ -40,9 +40,16 @@ def editor(room_id):
 def handle_join(data):
 	print("join")
 	room = data['room']
+	userName = data['userName']
 	join_room(room)
-    #emit('request_text', {'room': room}, to = room, skip_sid = True)  # Request current text from the room
+	emit('request_users', {'room': room, 'userName': userName}, to = room, skip_sid = True)  # Request current text from the room
 	emit('request_editors', {'room': room}, to = room, skip_sid = True)
+
+@socketio.on('requested_users')
+def requested_users(data):
+	room = data['room']
+	users = data['users']
+	emit('create_users', {'room': room, 'users': users}, to = room, skip_sid = True)  # Request current text from the room
 
 @socketio.on('requested_editors')
 def requested_editors(data):

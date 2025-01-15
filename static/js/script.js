@@ -4,6 +4,7 @@
 let activeTab = "file";
 let isRetracted = false;
 let editors = {};
+let users = [];
 let fileCount = 1;
 let currentDivOfFile = null;
 fileExtension = "py";
@@ -430,6 +431,17 @@ async function downloadFile() {
     }
 }
 
+/*
+ * When a user leaves the room this function updates the active users list.
+ * Sends room_id and users list to backend.
+ */
+
+window.addEventListener('beforeunload', (event) => {
+    const index = users.indexOf(userName);
+    users.splice(index, 1);
+    socket.emit('requested_users', { room: room_id, users});
+});
+
 //------------------------------------------------------(DEFAULT CODE MIRROR OBJECTS)---------------------------------------------------------
 
 /*
@@ -500,16 +512,15 @@ outputArea.setValue(data.result);
 //------------------------------------------------------(SOCKET)---------------------------------------------------------
 
 const socket = io();
-const room_id = "{{ room_id }}";
 
 /*
  * Emits join function upon loading the page(editor.html) once.
- * Sends room_id to backend.
+ * Sends room_id and userName to backend.
  */
 
 if (!window.hasRunOnce) {
     window.hasRunOnce = true;
-    socket.emit('join', { room: room_id });    
+    socket.emit('join', { room: room_id, userName : userName });
 }
 
 /*
@@ -544,6 +555,38 @@ socket.on('delete_file', (data) => {
 socket.on('rename_file', (data) => {
     if (data.room === room_id){
         renameFileByRequest(data.fileId, data.newFileName);
+    }
+})
+
+/*
+ * Appends new users name to users list.
+ * Emits users list back to requested_users exepct the new user.
+ */
+
+socket.on('request_users',(data) =>{
+    if(data.room === room_id){
+        users.push(data.userName)
+        if(!(users.length === 1)){
+            socket.emit('requested_users', { room: room_id, users});
+        }
+    }
+});
+
+/*
+ * Replaces users list with new users list sent from backend.
+ * Displayes the updated user list in users div.
+ */
+
+socket.on('create_users',(data) =>{
+    if(data.room === room_id){
+        users = data.users;
+        const usersContainer = document.getElementById("users");
+        usersContainer.innerHTML = "";
+        users.forEach(user => {
+            const userDiv = document.createElement("div");
+            userDiv.textContent = user;
+            usersContainer.appendChild(userDiv);
+        });
     }
 })
 
