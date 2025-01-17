@@ -118,18 +118,25 @@
             height: 100;
 
         }
+        .username-widget {
+            background-color: #eef3ff;
+            border: 1px solid #aac4ff;
+            border-radius: 5px;
+            padding: 2px 5px;
+            font-size: 12px;
+            font-family: Arial, sans-serif;
+            color: #0056b3;
+            white-space: nowrap;
+            pointer-events: none; /* Prevent interaction */
+        }
+
     </style>
     
 </head>
 
 <body>
-
     
-    
-    
-    <!-- Create TextArea -->
-    
- <div id="editorDiv">
+<div id="editorDiv">
     <div id="top">
         <h1>Editor</h1> 
     </div>
@@ -166,14 +173,13 @@
         </div>
 
         <div id="textAreaDiv">
-
             <div id="editor1">
                 <textarea id="textEditor1" rows="100" cols="100">#hello1</textarea>
             </div>
+        </div>
 
-        </div>
-        </div>
     </div>
+    
     <div id="popup" class="popup">
         <button onclick="deleteFile()">Delete</button>
         <button onclick="renameFile()">Rename</button>

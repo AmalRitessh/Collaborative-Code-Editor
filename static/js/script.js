@@ -5,6 +5,7 @@ let activeTab = "file";
 let isRetracted = false;
 let editors = {};
 let users = [];
+let userCursors = [];
 let fileCount = 1;
 let currentDivOfFile = null;
 fileExtension = "py";
@@ -81,6 +82,10 @@ function toggleEditor(editorId) {
 
     currentTextEditor = editors[`textEditor${editorId.split('r').pop()}`][0];
     currentTextEditorName = `textEditor${editorId.split('r').pop()}`;
+    if (userCursors.length > 0) {
+        const oldWidget = userCursors.splice(0, 1)[0];
+        oldWidget.remove();
+    }
     currentTextEditor.setCursor({ line: 0, ch: 0 });
 }
 
@@ -165,7 +170,8 @@ function createFile() {
     editor.push(editor[0].on('change', () => {
                 if (isProgrammaticChange) return;
                 const text = currentTextEditor.getValue();
-                socket.emit('update_text', { room: room_id, text, currentTextEditorName });
+                const cursor = currentTextEditor.getCursor();
+                socket.emit('update_text', { room: room_id, text, currentTextEditorName, userName, cursor });
             }));
 
     editors[`textEditor${fileCount}`] = editor;
@@ -230,7 +236,8 @@ function createFileByRequest(textEditorid, content, fileName) {
     editor.push(editor[0].on('change', () => {
                 if (isProgrammaticChange) return;
                 const text = currentTextEditor.getValue();
-                socket.emit('update_text', { room: room_id, text, currentTextEditorName });
+                const cursor = currentTextEditor.getCursor();
+                socket.emit('update_text', { room: room_id, text, currentTextEditorName, userName, cursor });
             }));
     
     editors[`textEditor${tempCount}`] = editor;
@@ -343,7 +350,8 @@ function renameFile(){
     editors[`textEditor${tempCount}`][2] = editors[`textEditor${tempCount}`][0].on('change', () => {
                 if (isProgrammaticChange) return;
                 const text = currentTextEditor.getValue();
-                socket.emit('update_text', { room: room_id, text, currentTextEditorName });
+                const cursor = currentTextEditor.getCursor();
+                socket.emit('update_text', { room: room_id, text, currentTextEditorName, userName, cursor });
             });
 
     toggleEditor(`editor${tempCount}`);
@@ -395,7 +403,8 @@ function renameFileByRequest(fileId, newFileName){
     editors[`textEditor${tempCount}`][2] = editors[`textEditor${tempCount}`][0].on('change', () => {
                 if (isProgrammaticChange) return;
                 const text = currentTextEditor.getValue();
-                socket.emit('update_text', { room: room_id, text, currentTextEditorName });
+                const cursor = currentTextEditor.getCursor();
+                socket.emit('update_text', { room: room_id, text, currentTextEditorName, userName, cursor });
             });
 
     toggleEditor(`editor${tempCount}`);
@@ -429,6 +438,31 @@ async function downloadFile() {
     catch (error) {
         console.error("Error creating the zip file:", error);
     }
+}
+
+/*
+ * showUsernameAboveCursor:
+ * Creates a widget of user who is currently typing.
+ * Updates the position dynamicly by removing the old position.
+ */
+
+function showUsernameAboveCursor(editor, userName, cursorPosition) {
+    if (userCursors.length > 0) {
+        const oldWidget = userCursors.splice(0, 1)[0];
+        oldWidget.remove();
+    }
+    const widget = document.createElement('div');
+    widget.className = 'username-widget';
+    widget.textContent = userName;
+    widget.style.position = 'absolute';
+    widget.style.backgroundColor = '#f0f0f0';
+    widget.style.padding = '2px 5px';
+    widget.style.borderRadius = '5px';
+    widget.style.fontSize = '12px';
+    widget.style.color = '#333';
+    widget.style.zIndex = 10;
+    editor.addWidget(cursorPosition, widget, true);
+    userCursors.push(widget);
 }
 
 /*
@@ -467,7 +501,8 @@ editor.push("index.py");
 editor.push(editor[0].on('change', () => {
                 if (isProgrammaticChange) return;
                 const text = currentTextEditor.getValue();
-                socket.emit('update_text', { room: room_id, text, currentTextEditorName });
+                const cursor = currentTextEditor.getCursor();
+                socket.emit('update_text', { room: room_id, text, currentTextEditorName, userName, cursor });
             }));
 editors[`textEditor1`] = editor;
 currentTextEditor = editors[`textEditor1`][0];
@@ -654,5 +689,6 @@ socket.on('update_text', (data) => {
     const cursor = tempTextEditor.getCursor();
     tempTextEditor.setValue(data.text);
     tempTextEditor.setCursor(cursor);
+    showUsernameAboveCursor(tempTextEditor, data.userName, data.cursor);
     isProgrammaticChange = false;
 });

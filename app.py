@@ -65,7 +65,9 @@ def handle_update(data):
     room = data['room']
     text = data['text']
     currentTextEditorName = data['currentTextEditorName']
-    emit('update_text', {'text': text, 'currentTextEditorName':currentTextEditorName}, to = room, skip_sid = True)   # Broadcast to all users
+    userName = data['userName']
+    cursor = data['cursor']
+    emit('update_text', {'text': text, 'currentTextEditorName':currentTextEditorName, 'userName':userName, 'cursor':cursor}, to = room, skip_sid = True)   # Broadcast to all users
 
 @socketio.on('create_new_file')
 def create_new_file(data):
