@@ -476,6 +476,16 @@ window.addEventListener('beforeunload', (event) => {
     socket.emit('requested_users', { room: room_id, users});
 });
 
+/*
+ * copyToClipboard:
+ * Copies the url of room.
+ */
+
+function copyToClipboard(link = window.location.href) {
+    navigator.clipboard.writeText(link)
+    alert("Link copied!");
+}
+
 //------------------------------------------------------(DEFAULT CODE MIRROR OBJECTS)---------------------------------------------------------
 
 /*
