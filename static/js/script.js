@@ -34,7 +34,7 @@ document.addEventListener('click', () => {
  * Retracts the editor when tab is clicked twice.
  */
 
-function toggleTab(tabId) {
+function toggleTab(tabId, event) {
     const ioAreaDiv = document.getElementById("ioAreaDiv");
     const textAreaDiv = document.getElementById("textAreaDiv");
     const tabs = document.querySelectorAll('.tab');
@@ -55,10 +55,16 @@ function toggleTab(tabId) {
     isRetracted = false;
     ioAreaDiv.classList.remove("retracted");
     textAreaDiv.style.flexGrow = "2"; 
+
+    // Hide all content sections and remove the active class from all tabs
     contents.forEach(content => content.classList.add("hidden"));
     tabs.forEach(tab => tab.classList.remove("active"));
+
+    // Show the selected tab's content and mark the clicked tab as active
     document.getElementById(tabId).classList.remove("hidden");
-    event.target.classList.add("active");
+    event.target.closest(".tab").classList.add("active");
+
+    // Update the active tab
     activeTab = tabId;
 }
 
@@ -69,9 +75,19 @@ function toggleTab(tabId) {
 
 function toggleEditor(editorId) {         
     const editorsDiv = document.querySelectorAll('#textAreaDiv > div');
+    const tabEditors = document.querySelectorAll('#file > div');
 
     editorsDiv.forEach(editor => {
         editor.style.display = editor.id === editorId ? 'block' : 'none';
+    });
+
+    tabEditors.forEach(editor => {
+        if(editor.id.split('e').pop() == editorId.split('r').pop()){
+            editor.classList = "tabEditor active"
+        }
+        else{
+            editor.classList = "tabEditor"
+        }
     });
 
     const tab = document.querySelector(`#file .tab[onclick*="${editorId}"]`);
@@ -130,7 +146,7 @@ function createFile() {
     const newTab = document.createElement('div');
 
     newTab.id = `file${fileCount}`;
-    newTab.className = "tab active";
+    newTab.className = "tabEditor active";
     newTab.setAttribute('onclick', `toggleEditor('${newEditorId}')`);
     newTab.setAttribute('oncontextmenu', `popupMenu(event)`);
     newTab.textContent = fileName;
@@ -195,7 +211,7 @@ function createFileByRequest(textEditorid, content, fileName) {
     const newTab = document.createElement('div');
 
     newTab.id = `file${tempCount}`;
-    newTab.className = "tab active";
+    newTab.className = "tabEditor active";
     newTab.setAttribute('onclick', `toggleEditor('${newEditorId}')`);
     newTab.setAttribute('oncontextmenu', `popupMenu(event)`);
     newTab.textContent = fileName;
@@ -523,12 +539,14 @@ var outputArea = CodeMirror.fromTextArea(document.getElementById('outputArea'), 
     lineNumbers: false,
     theme: "material-darker",
 });
+outputArea.getWrapperElement().classList.add('output-codemirror');
 
 var inputArea = CodeMirror.fromTextArea(document.getElementById('inputArea'), {
     mode: "text/plain",
     lineNumbers: false,
     theme: "material-darker",
 });
+inputArea.getWrapperElement().classList.add('output-codemirror');
 
 //------------------------------------------------------(COMPILE)---------------------------------------------------------
 
@@ -629,11 +647,12 @@ socket.on('create_users',(data) =>{
         usersContainer.innerHTML = "";
         users.forEach(user => {
             const userDiv = document.createElement("div");
+            userDiv.className = "userDisplay";
             userDiv.textContent = user;
             usersContainer.appendChild(userDiv);
         });
     }
-})
+});
 
 /*
  * Creates a temporary list with textEditorId, contents and fileName of each editor.
