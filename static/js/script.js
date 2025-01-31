@@ -82,11 +82,13 @@ function toggleEditor(editorId) {
     });
 
     tabEditors.forEach(editor => {
-        if(editor.id.split('e').pop() == editorId.split('r').pop()){
-            editor.classList = "tabEditor active"
-        }
-        else{
-            editor.classList = "tabEditor"
+        if(editor.id != "file-box"){
+            if(editor.id.split('e').pop() == editorId.split('r').pop()){
+                editor.classList = "tabEditor active"
+            }
+            else{
+                editor.classList = "tabEditor"
+            }
         }
     });
 
@@ -539,14 +541,14 @@ var outputArea = CodeMirror.fromTextArea(document.getElementById('outputArea'), 
     lineNumbers: false,
     theme: "material-darker",
 });
-outputArea.getWrapperElement().classList.add('output-codemirror');
+outputArea.getWrapperElement().classList.add('result-codemirror');
 
 var inputArea = CodeMirror.fromTextArea(document.getElementById('inputArea'), {
     mode: "text/plain",
     lineNumbers: false,
     theme: "material-darker",
 });
-inputArea.getWrapperElement().classList.add('output-codemirror');
+inputArea.getWrapperElement().classList.add('result-codemirror');
 
 //------------------------------------------------------(COMPILE)---------------------------------------------------------
 

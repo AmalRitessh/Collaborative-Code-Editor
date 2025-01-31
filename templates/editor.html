@@ -11,22 +11,42 @@
 
     <style>
 
-    .CodeMirror {
-        font-size: 20px; /* Adjust this value to increase or decrease text size */
-    }
+        .CodeMirror {
+            font-size: 20px; /* Adjust this value to increase or decrease text size */
+        }
+
         body {
         margin: 0;
         font-family: Arial, sans-serif;
 
         }
         #editorDiv {
+            height: 100vh;
             display: flex;
-            width: 100%;
-          
+            flex-direction: column;  
         }
+
+        #top {
+            text-align: center;
+            background-color: #DCD7C9;
+            flex: 1;
+        }
+
+        #bottom {
+            display: flex;
+            background-color: #DCD7C9;
+            flex: 9; 
+        }
+        
+        #file-top{
+            display: flex;
+            flex-direction: row;
+            gap:10px;
+        }
+
         #sidebar {
             padding: 5px;
-            width: 140px;
+            width: 90px;
             background-color: #2C3639;
             color: white;
             display: flex;
@@ -37,7 +57,7 @@
 
         }
         .tab {
-            width: 120px;
+            width: 70px;
             height: 50px;
             margin: 10px;
             display: flex;
@@ -61,7 +81,8 @@
         }
 
         .tabEditor {
-            width: 350px;
+            color: white;
+            font-size: 15px;
             height: 50px;
             margin: 10px;
             display: flex;
@@ -77,7 +98,7 @@
 
         .tabEditor:hover {
             background-color: #A27B5C;
-            transform: scale(1.1);
+            transform: scale(1.05);
         }
         .tabEditor.active {
             background-color: #A27B5C;
@@ -91,26 +112,29 @@
             background-color: #2C3639;
             border-radius: 8px;
             height: 100;
-
+            min-width: 130px;
         }
+
         #textAreaDiv {
             flex: 2;
             padding: 10px;
             border: 1px solid #ccc;
             background-color: #2C3639;
             border-radius: 8px;
-            min-width: 300px;
             border: 3px solid #DCD7C9;
         }
 
         #popup {
             position: absolute;
             display: none;
-            background-color: white;
-            border: 1px solid #ccc;
+            background-color: #2C3639;
+            border: 1px solid #DCD7C9;
             box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
             z-index: 1000;
             padding: 10px;
+            border-radius: 15px;
+            height: 56px;
+            width: 120px;
         }
 
         .hidden {
@@ -122,12 +146,14 @@
             display: none;
             
         }
+        
         button{
             display: block;
             color: white;
             width: 100%;
             margin-bottom: 10px;
             height: 50px;
+            font-size: 15px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -144,6 +170,25 @@
             box-shadow: 0 0 8px #A27B5C;
 
         }
+
+        .button-popup{
+            display: block;
+            color: white;
+            width: 100%;
+            margin-bottom: 5px;
+            height: 25px;
+            font-size: 13px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #3F4E4F;
+            border: 1px;
+            border-color: black;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
         textarea, select {
             display: block;
             width: 100%;
@@ -154,25 +199,13 @@
             overflow: hidden;
         }
 
-
-        #top {
-            position: absolute;
-            top: 0;
-            width: 100%;
-            height: 10%;
-            text-align: center;
-            background-color: #DCD7C9;
-
+        #file{
+            padding: 5px;
         }
 
-        #bottom {
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            padding: 10px;
-            display: flex;
-            height: 88%;
-            background-color: #DCD7C9;
+        #run{
+            padding: 5px;
+            color: white;
         }
 
         #download{
@@ -199,11 +232,11 @@
             height: 100%;
         }
         .CodeMirror{
-            height: 770px;
+            height: 565px;
         }
 
-        .CodeMirror.output-codemirror {
-            height: 300px; /* Custom height for the output area */
+        .CodeMirror.result-codemirror {
+            height: 200px; /* Custom height for the output area */
         }
         .userDisplay{
             height: 50px;
@@ -231,9 +264,16 @@
         <div id="ioAreaDiv">
 
             <div id="file" class="content">
-                <button onclick="createFile()">Create File</button>
-                <button class="copy-button" onclick="copyToClipboard()">Copy Link</button>
-                <button id="download "onclick="downloadFile()">Download</button> 
+                <div id = "file-box">
+                    <div id = "file-top">
+                        <button onclick="createFile()">Create File</button>
+                        <button class="copy-button" onclick="copyToClipboard()">Copy Link</button>                        
+                    </div>
+                    <div id ="file-bottom">
+                        <button id="download "onclick="downloadFile()">Download</button>                         
+                    </div>
+                </div>
+
                 <div id="file1" class="tabEditor active" onclick="toggleEditor('editor1')" oncontextmenu="popupMenu(event)" >
                     index.py
                 </div>
@@ -262,8 +302,8 @@
     </div>
     
     <div id="popup" class="popup">
-        <button onclick="deleteFile()">Delete</button>
-        <button onclick="renameFile()">Rename</button>
+        <button class="button-popup" style="color: red;" onclick="deleteFile()">Delete</button>
+        <button class="button-popup" onclick="renameFile()">Rename</button>
     </div>
 
     <!-- CodeMirror JS -->
