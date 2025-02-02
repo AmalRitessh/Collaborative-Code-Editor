@@ -645,7 +645,7 @@ socket.on('request_users',(data) =>{
 socket.on('create_users',(data) =>{
     if(data.room === room_id){
         users = data.users;
-        const usersContainer =  document.querySelector(".user");
+        const usersContainer = document.querySelector(".user");
         usersContainer.innerHTML = "";
         users.forEach(user => {
             const userDiv = document.createElement("div");
