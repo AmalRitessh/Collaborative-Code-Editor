@@ -239,9 +239,33 @@
             height: 200px; /* Custom height for the output area */
         }
         .userDisplay{
+            font-size: 30px;
             height: 50px;
             width:50px;
             background-color: #DCD7C9;
+            border-radius: 10px;
+            text-align: center;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: black;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        .userName {
+            margin-top: 1px;
+            font-size: 14px;
+            max-width: 80px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: white;
+        }
+        .userWrapper {
+            width: 70px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
     </style>
     
@@ -279,7 +303,7 @@
                 </div>
             </div>
 
-            <div id="run" class="content hidden">
+            <div id="run" class="content hidden" >
                 <button onclick="fetchData()">Run</button>
                 <p>Input:</p>
                 <textarea id="inputArea"  name="inputArea" rows="10" cols="10"></textarea>
@@ -287,8 +311,13 @@
                 <textarea id="outputArea" name="outputArea" rows="10" cols="10"></textarea>
             </div>
 
-            <div id="users" class="content hidden">
-                <div class="userDisplay">{{ userName }}</div>
+            <div id="users" class=" content hidden"  >
+                <div class="user" style="display: flex; flex-wrap: wrap; flex-direction: row;">
+                    <div class="userWrapper">
+                        <div class="userDisplay">{{ userName[0].upper() }}</div>
+                        <div class="userName">{{ userName }}</div>
+                    </div>
+                </div>
             </div>
 
         </div>

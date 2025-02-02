@@ -645,12 +645,29 @@ socket.on('request_users',(data) =>{
 socket.on('create_users',(data) =>{
     if(data.room === room_id){
         users = data.users;
-        const usersContainer = document.getElementById("users");
+        const usersContainer =  document.querySelector(".user");
         usersContainer.innerHTML = "";
         users.forEach(user => {
             const userDiv = document.createElement("div");
-            userDiv.className = "userDisplay";
-            userDiv.textContent = user;
+            userDiv.className = "userWrapper";
+
+            const avatarDiv = document.createElement("div");
+            avatarDiv.className = "userDisplay";
+            avatarDiv.textContent = user[0].toUpperCase();
+
+
+            const nameDiv = document.createElement("div");
+            nameDiv.className = "userName";
+            nameDiv.textContent = user;
+
+
+            if (user.length > 10) {
+                nameDiv.classList.add("tooltip");
+                nameDiv.setAttribute("title", user);
+            }
+
+            userDiv.appendChild(avatarDiv);
+            userDiv.appendChild(nameDiv);
             usersContainer.appendChild(userDiv);
         });
     }
