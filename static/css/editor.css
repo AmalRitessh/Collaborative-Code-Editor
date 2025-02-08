@@ -222,6 +222,9 @@ textarea, select {
     color: #0056b3;
     white-space: nowrap;
     pointer-events: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100px;
 }
 
 #inputArea{
@@ -229,11 +232,11 @@ textarea, select {
 }
 
 .CodeMirror{
-    height: 565px;
+    height: 565px !important;
 }
 
 .CodeMirror.result-codemirror {
-    height: 200px;
+    height: 200px !important;
 }
 
 .userDisplay{

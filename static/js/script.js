@@ -281,7 +281,7 @@ function deleteFile() {
         editorToDelete.remove();
         delete editors[`textEditor${currentDivOfFile.split('e').pop()}`]
 
-        const remainingTabs = document.querySelectorAll('#file .tab');
+        const remainingTabs = document.querySelectorAll('#file .tabEditor');
         if (remainingTabs.length > 0) {
             remainingTabs[0].click(); 
         }
@@ -305,7 +305,7 @@ function deleteFileByRequest(fileId) {
     editorToDelete.remove();
     delete editors[`textEditor${fileId.split('e').pop()}`]
 
-    const remainingTabs = document.querySelectorAll('#file .tab');
+    const remainingTabs = document.querySelectorAll('#file .tabEditor');
     if (remainingTabs.length > 0) {
         remainingTabs[0].click();
     }   
@@ -658,6 +658,7 @@ socket.on('create_users',(data) =>{
 
             const nameDiv = document.createElement("div");
             nameDiv.className = "userName";
+            nameDiv.title = user;
             nameDiv.textContent = user;
 
 
