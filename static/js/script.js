@@ -92,7 +92,7 @@ function toggleEditor(editorId) {
         }
     });
 
-    const tab = document.querySelector(`#file .tab[onclick*="${editorId}"]`);
+    const tab = document.querySelector(`#file .tabEditor[onclick*="${editorId}"]`);
 
     if (tab) {
         fileExtension = tab.textContent.split('.').pop();

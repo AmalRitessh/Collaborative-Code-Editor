@@ -1,4 +1,4 @@
-# Use an official Python image as the base image
+# Official Python image as the base image
 FROM python:3.9-slim
 
 # Install necessary packages for building and running C++ programs
@@ -9,18 +9,19 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Set the working directory in the container
-WORKDIR /apps
+WORKDIR /CollaBrix
 
-# Copy all contents from the current directory to the working directory
+# Copying all files to directory
 COPY . .
 
-# Install Python dependencies if any (ensure you have a requirements.txt)
-# Uncomment the next line if you have a requirements.txt file
-# RUN pip install --no-cache-dir -r requirements.txt
+# Installing Flask dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Env variable
+ENV PORT=5000
 
 # Expose port 5000
 EXPOSE 5000
 
 # Set the default command to run app.py
 CMD ["python", "app.py"]
-

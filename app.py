@@ -30,11 +30,11 @@ def compile():
 
 @app.route('/editor/<string:room_id>', methods=['GET', 'POST'])
 def editor(room_id):
-    if request.method == 'POST':
-        username = request.form.get('username')
-        return render_template('editor.html', room_id=room_id, userName=username)
-    else:
-        return redirect((url_for("index", room_id = room_id)))
+	if request.method == 'POST':
+		username = request.form.get('username')
+		return render_template('editor.html', room_id=room_id, userName=username)
+	else:
+		return redirect((url_for("index", room_id = room_id)))
 
 @socketio.on('join')
 def handle_join(data):
@@ -62,12 +62,12 @@ def requested_editors(data):
 
 @socketio.on('update_text')
 def handle_update(data):
-    room = data['room']
-    text = data['text']
-    currentTextEditorName = data['currentTextEditorName']
-    userName = data['userName']
-    cursor = data['cursor']
-    emit('update_text', {'text': text, 'currentTextEditorName':currentTextEditorName, 'userName':userName, 'cursor':cursor}, to = room, skip_sid = True)   # Broadcast to all users
+	room = data['room']
+	text = data['text']
+	currentTextEditorName = data['currentTextEditorName']
+	userName = data['userName']
+	cursor = data['cursor']
+	emit('update_text', {'text': text, 'currentTextEditorName':currentTextEditorName, 'userName':userName, 'cursor':cursor}, to = room, skip_sid = True)   # Broadcast to all users
 
 @socketio.on('create_new_file')
 def create_new_file(data):
@@ -137,4 +137,4 @@ def code_exe(language,code,inputVal):
 		return "Timeout expired. The code execution took too long."
 
 if __name__ == '__main__':
-	app.run(debug=True)
+	app.run(host='0.0.0.0', port=5000, debug=True)
