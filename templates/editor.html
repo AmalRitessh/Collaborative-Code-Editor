@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>c++ Text Editor</title>
+    <title>CollaBrix Editor</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/editor.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/codemirror.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/theme/material-darker.min.css">
@@ -37,9 +38,7 @@
                     </div>
                 </div>
 
-                <div id="file1" class="tabEditor active" onclick="toggleEditor('editor1')" oncontextmenu="popupMenu(event)" >
-                    index.py
-                </div>
+                <div id="file1" class="tabEditor active" onclick="toggleEditor('editor1')" oncontextmenu="popupMenu(event)" >index.py</div>
             </div>
 
             <div id="run" class="content hidden">
